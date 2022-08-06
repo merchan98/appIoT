@@ -5,21 +5,16 @@ export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'appIoT',
-    htmlAttrs: {
-      lang: 'en'
-    },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800' },
       { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css' }
     ],
-    
     bodyAttrs: {
       class: '' // Add `white-content` class here to enable "white" mode.
     }
@@ -47,8 +42,13 @@ export default {
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
-  components: true,
-
+  components: [
+    {
+      path: '~/components',
+      pathPrefix:false,
+      extensions: ['vue','jsx'],
+    }
+  ],
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
   ],
