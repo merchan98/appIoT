@@ -1,6 +1,10 @@
+<!-- Template por defecto de Creative Tim -->
+
 <template>
   <div class="wrapper" :class="{ 'nav-open': $sidebar.showSidebar }">
+
     <notifications></notifications>
+    
     <side-bar
       :background-color="sidebarBackground"
       short-title="DashIOT"
@@ -11,30 +15,53 @@
           :link="{
             name: 'Dashboard',
             icon: 'tim-icons icon-chart-pie-36',
-            path: '/'
+            path: '/dashboard'
+          }"
+        >
+        </sidebar-item>
+        
+        <sidebar-item
+          :link="{
+            name: 'Dispositivos',
+            icon: 'tim-icons icon-atom',
+            path: '/dispositivos'
+          }"
+        >
+        </sidebar-item>
+        
+        <sidebar-item
+          :link="{
+            name: 'Alarmas/Reglas',
+            icon: 'tim-icons icon-atom',
+            path: '/alarmas'
           }"
         >
         </sidebar-item>
         <sidebar-item
           :link="{
-            name: 'Iconos',
+            name: 'Templates',
             icon: 'tim-icons icon-atom',
-            path: '/icons'
+            path: '/templates'
           }"
         >
         </sidebar-item>
-
-        <li class="active-pro">
+        <!-- Descativado el boton Upgrade a PRO -->
+        <!-- <li class="active-pro">
           <a href="https://www.creative-tim.com/product/nuxt-black-dashboard-pro" target="_blank">
             <i class="tim-icons icon-spaceship"></i>
             <p>Upgrade to PRO</p>
           </a>
-        </li>
+        </li> -->
+
       </template>
     </side-bar>
+
     <!--Share plugin (for demo purposes). You can remove it if don't plan on using it-->
-    <sidebar-share :background-color.sync="sidebarBackground"> </sidebar-share>
+    <!-- <sidebar-share :background-color.sync="sidebarBackground"> </sidebar-share> -->
+    
+    <!-- Panel central-->
     <div class="main-panel" :data="sidebarBackground">
+      <!--Barra de arriba-->
       <dashboard-navbar></dashboard-navbar>
       <router-view name="header"></router-view>
 
@@ -50,8 +77,10 @@
           
         </zoom-center-transition>
       </div>
+      <!--Footer-->
       <content-footer v-if="!isFullScreenRoute"></content-footer>
     </div>
+
   </div>
 </template>
 <script>
