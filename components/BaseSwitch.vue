@@ -41,6 +41,8 @@ export default {
   methods: {
     triggerToggle() {
       this.model = !this.model;
+      // Modificacion realizada para el correcto funcionamiento de onclick
+      this.$emit('click');
     }
   }
 };
