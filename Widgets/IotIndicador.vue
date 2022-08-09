@@ -42,7 +42,9 @@ export default {
 
         this.$nuxt.$on(topic,this.procesadoDatosRecibidos)
     },
-    deforeDestroy(){
+    beforeDestroy(){
+        // Para que la subcion al topico se destruya ya que 
+        // el mounted se ejecuta cada vez que visitas la pagina
         this.$nuxt.$off(this.config.userId + "/" + this.config.selectedDevice.dID + "/" + this.config.variable + "/adata");
     },
     methods: {
