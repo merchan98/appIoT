@@ -1,10 +1,10 @@
 <template>
     <card>
         <div slot="header">
-            <h4 class="card-title">{{config.selectedDevice.name}} - {{config.variableFullName}}</h4>
+            <h4 class="card-title">{{config.dispositvoSelecionado.name}} - {{config.variableFullName}}</h4>
         </div>
 
-        <i class="fa " :class="[config.icon, getIconColorClass() ]" style="font-size: 30px "></i>
+        <i class="fa " :class="[config.icono, getIconColorClass() ]" style="font-size: 30px "></i>
     </card>
 </template>
 
@@ -17,7 +17,7 @@ export default {
             value: TextTrackCueList//false, //valor del icono
             // config: {
             //     userId: 'userid',
-            //     selectedDevice: {
+            //     dispositvoSelecionado: {
             //         name: "Hogar",
             //         dID: "9874",
             //         templateName: "Senores",
@@ -26,7 +26,7 @@ export default {
             //     },
             //     variableFullName: "Pump",
             //     variable: "ClaveUnicaString",
-            //     icon: "fa-sun",
+            //     icono: "fa-sun",
             //     column: 'col-6',
             //     widgetType: "indicator",
             //     class: 'danger'
@@ -35,7 +35,7 @@ export default {
     },
     mounted(){
         //this.$nuxt.$on('widget-tipic', this.procesadoDatosRecibidos)
-        const topic = this.config.userId + "/" + this.config.selectedDevice.dID + "/" + this.config.variable + "/adata";
+        const topic = this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/sdata";
         
         console.log("Salida de IOTIndicador");
         console.log(topic);
@@ -45,7 +45,7 @@ export default {
     beforeDestroy(){
         // Para que la subcion al topico se destruya ya que 
         // el mounted se ejecuta cada vez que visitas la pagina
-        this.$nuxt.$off(this.config.userId + "/" + this.config.selectedDevice.dID + "/" + this.config.variable + "/adata");
+        this.$nuxt.$off(this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/sdata");
     },
     methods: {
 

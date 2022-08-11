@@ -1,10 +1,10 @@
 <template>
     <card>
         <div slot="header">
-            <h4 class="card-title">{{config.selectedDevice.name}} - {{config.variableFullName}}</h4>
+            <h4 class="card-title">{{config.dispositvoSelecionado.name}} - {{config.variableFullName}}</h4>
         </div>
 
-        <i class="fa " :class="[config.icon, getIconColorClass() ]" style="font-size: 30px "></i>
+        <i class="fa " :class="[config.icono, getIconColorClass() ]" style="font-size: 30px "></i>
 
         <div class="row pull-right">
             <base-button @click="enviarValor()" type="primary" class="mb-3" size="lg">Añadir</base-button>
@@ -23,7 +23,7 @@ export default {
             enviado: false,
             // config:{
             //     userId: 'userid',
-            //     selectedDevice: {
+            //     dispositvoSelecionado: {
             //         name: "Hogar",
             //         dID: "9874",
             //         templateName: "Senores",
@@ -42,12 +42,14 @@ export default {
     },
     mounted(){
         //this.$nuxt.$on('widget-tipic', this.procesadoDatosRecibidos)
-        const topic = this.config.userId + "/" + this.config.selectedDevice.dID + "/" + this.config.variable + "/actdata";
+        const topic = this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/actdata";
         
         this.$nuxt.$on(topic,this.procesadoDatosRecibidos);
     },
-    deforeDestroy(){
-        this.$nuxt.$off(this.config.userId + "/" + this.config.selectedDevice.dID + "/" + this.config.variable + "/actdata");
+    beforeDestroy(){
+        // Para que la subcion al topico se destruya ya que 
+        // el mounted se ejecuta cada vez que visitas la pagina
+        this.$nuxt.$off(this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/actdata");
     },
     methods: {
 
@@ -65,7 +67,7 @@ export default {
             }, 1000)
 
             const toSend ={
-                topic: this.config.userId + "/" + this.config.selectedDevice.dID + "/" + this.config.variable + "/actdata",
+                topic: this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/actdata",
                 msg: {
                     value: this.config.message
                 }
