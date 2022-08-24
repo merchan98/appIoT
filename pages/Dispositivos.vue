@@ -104,6 +104,9 @@ export default {
             ]
         }
     },
+    mounted() {
+        this.getDispositivos();
+    },
     methods: {
         deleteDispositivo(dispositvo){
             alert("Borrando dispositivo"+ dispositvo.name)
@@ -111,6 +114,19 @@ export default {
         updateRuleGuardarDatos(index){
             // console.log(inde);
             this.dispositivos[index].saverRule = !this.dispositivos[index].saverRule;
+        },
+        getDispositivos() {
+            const headerAxios = {
+                headers: {
+                    token: this.$store.state.auth.token
+                }
+            }
+            this.$axios.get("/api/dispositivo", headerAxios)
+                .then(res => {
+                    console.log("Salida GET Dispositvo desde dispostivos.vue");
+                    console.log(res.data.data);
+                    this.devices =res.data.data
+            })
         }
     }
 };
