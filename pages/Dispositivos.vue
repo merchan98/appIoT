@@ -29,10 +29,10 @@
         <div class="row">
             <card>
                 <div slot="header">
-                    <h4 class="card-title">Dispositviso</h4>
+                    <h4 class="card-title">Dispositivos</h4>
                 </div>
             
-                <el-table :data="dispositivos">
+                <el-table :data="$store.state.dispositivos">
                     <el-table-column prop="name" label="Nombre"></el-table-column>
                     <el-table-column prop ="dID" label="Id Dispositivo"></el-table-column>
                     <el-table-column prop ="templateName" label="Plantilla"></el-table-column>
@@ -79,55 +79,43 @@ export default {
     },
     data(){
         return{
-            dispositivos: [
-                {
-                    name: "Hogar",
-                    dID: "9874",
-                    templateName: "Senores",
-                    templateID: "46468464",
-                    saverRule:false
-                },
-                {
-                    name: "Oficina",
-                    dID: "9874",
-                    templateName: "Senores",
-                    templateID: "46468464",
-                    saverRule:true
-                },
-                {
-                    name: "Granja",
-                    dID: "9874",
-                    templateName: "Senores",
-                    templateID: "46468464",
-                    saverRule:false
-                }
-            ]
+            // dispositivos: [
+            //     {
+            //         name: "Hogar",
+            //         dID: "9874",
+            //         templateName: "Senores",
+            //         templateID: "46468464",
+            //         saverRule:false
+            //     },
+            //     {
+            //         name: "Oficina",
+            //         dID: "9874",
+            //         templateName: "Senores",
+            //         templateID: "46468464",
+            //         saverRule:true
+            //     },
+            //     {
+            //         name: "Granja",
+            //         dID: "9874",
+            //         templateName: "Senores",
+            //         templateID: "46468464",
+            //         saverRule:false
+            //     }
+            // ]
         }
     },
     mounted() {
-        this.getDispositivos();
+        this.$store.dispach("getDispositivos");
     },
     methods: {
         deleteDispositivo(dispositvo){
             alert("Borrando dispositivo"+ dispositvo.name)
         },
         updateRuleGuardarDatos(index){
-            // console.log(inde);
+            // console.log(index);
             this.dispositivos[index].saverRule = !this.dispositivos[index].saverRule;
-        },
-        getDispositivos() {
-            const headerAxios = {
-                headers: {
-                    token: this.$store.state.auth.token
-                }
-            }
-            this.$axios.get("/api/dispositivo", headerAxios)
-                .then(res => {
-                    console.log("Salida GET Dispositvo desde dispostivos.vue");
-                    console.log(res.data.data);
-                    this.devices =res.data.data
-            })
         }
+        
     }
 };
 </script>
