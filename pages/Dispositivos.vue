@@ -70,6 +70,7 @@ import BaseSwitch from '~/components/BaseSwitch.vue';
 
 
 export default {
+    middleware: 'autentificador',
     components: {
         [Select.name]: Select,
         [Table.name]: Table,

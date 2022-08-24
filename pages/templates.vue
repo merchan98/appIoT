@@ -180,7 +180,7 @@ import IotSwitch from '~/Widgets/IotSwitch.vue';
 
 
 
-    export default{
+export default{
     components: {
     IotBoton,
     IotIndicador,
@@ -193,7 +193,8 @@ import IotSwitch from '~/Widgets/IotSwitch.vue';
     IotIndicador,
     IoTGraficaNum,
     IotSwitch
-},
+    },
+    middleware: 'autentificador',
         data(){
             return {
                 widgets: [],

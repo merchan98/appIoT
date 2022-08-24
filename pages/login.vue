@@ -54,6 +54,7 @@
     <script>
         export default {
             layout: "autentificacion",
+            middleware: 'noAutentificador',
             data() {
                 return {
                 usuario: {
