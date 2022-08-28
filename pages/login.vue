@@ -34,7 +34,7 @@
                         native-type="submit" type="secondary"
                         class="mb-3" size="sm"
                         block
-                    > <nuxt-link class="text-white" to="/login">Registarse</nuxt-link> </base-button>
+                    > <nuxt-link class="text-white" to="/registro">Registarse</nuxt-link> </base-button>
                     <!-- <div class="pull-left">
                         <h6>
                         <nuxt-link class="link footer-link" to="/login">
@@ -65,7 +65,7 @@
             },
             methods: {
                 login() {
-                    this.$axios.post("/api/login", this.usuario)
+                    this.$axios.post("/login", this.usuario)
                         .then((res) => {//Todo ha ido bien
                         
                         // console.log(res.data);
@@ -79,7 +79,7 @@
                             //Persistencia del TOken
                             const auth = {
                                 token: res.data.token,
-                                datosUsuario: res.data.datosUsuario
+                                datosUsuarios: res.data.datosUsuarios
                             }
 
                             //llamamos a la mutacion para guardar el token en la store
@@ -89,24 +89,25 @@
                             localStorage.setItem('auth', JSON.stringify(auth));
 
                             //Redirección hacia la pagina principal
-                            $nux.$router.push('/dashboard');
+                            $nuxt.$router.push("/dashboard");
 
                             return;
                         }
 
                     })
 
-                    .catch((error) => {
-                        //console.log(error.response.data);
+                        .catch((error) => {
+                        // console.log("ERORRO EN EL REGISTRE PAG");
+                        // console.log(error.response.data);
                         if (error.response.data.error.errors.email.kind == "unique") {
-                            this.$$notify({ //si el mail ya existe
-                                type: "danger",
+                            this.$notify({ //si el mail ya existe
+                                type: "secondary",
                                 icon: "tim-icons icon-alert-circle-exc",
                                 message: "Hay un problema al registarte. El correo ya esta en uso."
                             })
                             return;
                         } else {//otro error
-                            this.$$notify({
+                            this.$notify({
                                 type: "danger",
                                 icon: "tim-icons icon-alert-circle-exc",
                                 message: "Hay un problema al registarte."

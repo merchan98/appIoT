@@ -71,7 +71,7 @@
             },
             methods: {
                 registrase() {
-                    this.$axios.post("/api/registro", this.usuario)
+                    this.$axios.post("/registro", this.usuario)
                         .then((res) => {//Todo ha ido bien
                         
                         // console.log(res.data);
@@ -95,14 +95,14 @@
                     .catch((error) => {
                         //console.log(error.response.data);
                         if (error.response.data.error.errors.email.kind == "unique") {
-                            this.$$notify({ //si el mail ya existe
+                            this.$notify({ //si el mail ya existe
                                 type: "danger",
                                 icon: "tim-icons icon-alert-circle-exc",
                                 message: "Hay un problema al registarte. El correo ya esta en uso."
                             })
                             return;
                         } else {//otro error
-                            this.$$notify({
+                            this.$notify({
                                 type: "danger",
                                 icon: "tim-icons icon-alert-circle-exc",
                                 message: "Hay un problema al registarte."
