@@ -20,6 +20,7 @@ appExpres.use(express.urlencoded({
 //Rutas de espress
 appExpres.use('/api', require('./rutas/dispositivos.js'))
 appExpres.use('/api', require('./rutas/usuarios.js'))
+appExpres.use('/api', require('./rutas/plantillas.js'))
 module.exports=appExpres;
 
 //listener 

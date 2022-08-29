@@ -9,7 +9,7 @@ export const mutations = {
     setAuth(state, authRecibido) {
         state.auth = authRecibido
     },
-    serDispositivos(state, dispositivosEntrada) {
+    setDispositivos(state, dispositivosEntrada) {
         state.dispositivos = dispositivosEntrada;
     }
 }
@@ -30,20 +30,24 @@ export const actions = {
 
     },
     getDispositivos() {
-            const headerAxios = {
-                headers: {
-                    token: this.state.auth.token
-                }
+            
+        const headerAxios = {
+            headers: {
+                token: this.state.auth.token
             }
-            this.$axios.get("/api/dispositivo", headerAxios)
-                .then(res => {
-                    //Prueba
-                    console.log("Salida GET Dispositvo desde store");
-                    console.log(res.data.data);
-
-                    this.commit("setDispostivos", res.data.data)
-            })
         }
+
+        console.log(this.state.auth.token);
+
+        this.$axios.get("/dispositivo", headerAxios)
+            .then(res => {
+                //Prueba
+                console.log("Salida GET Dispositvo desde store");
+                console.log(res.data.data);
+                
+                this.commit("setDispositivos", res.data.data)
+        })
+    }
 }
 
 

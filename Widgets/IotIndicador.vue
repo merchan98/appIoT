@@ -21,7 +21,7 @@ export default {
             //         name: "Hogar",
             //         dID: "9874",
             //         templateName: "Senores",
-            //         templateID: "46468464",
+            //         plantillaID: "46468464",
             //         saverRule:false,
             //     },
             //     variableFullName: "Pump",

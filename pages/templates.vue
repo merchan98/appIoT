@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2> Templates</h2>
+        <h2> Plantillas</h2>
         <!-- 
         <iot-boton :config="configBoton"></iot-boton>
         <IotIndicador :config="config"></IotIndicador>
@@ -40,18 +40,20 @@
                     <div v-if="widgetTipo == 'switch'">
                         <base-input v-model="configSwitch.variableFullName" label="Var Name" type="text"></base-input>
                         <base-input v-model="configSwitch.icono" label="Icono" type="text"></base-input>
-                        <br/>
-
-                        <el-select v-model="configSwitch.class" class="select-success" placeholder="Selecciona una Clase" style="width 100%;">
+                        
+                        <label>Clase icono</label>
+                        <el-select v-model="configSwitch.class" class="select-success" label="Clase icono" placeholder="Selecciona una Clase" style="width: 100%;" >
                             <el-option class="text-success" value="success" label="Success"></el-option>
-                            <el-option class="text-primary" value="primary" label="Primary" ></el-option> 
-                            <el-option class="text-warning" value="warning" label="Warning" ></el-option>
-                            <el-option class="text-danger"  value="danger"  label="Danger" ></el-option>
+                            <el-option class="text-primary" value="primary" label="Primary"></el-option> 
+                            <el-option class="text-warning" value="warning" label="Warning"></el-option>
+                            <el-option class="text-danger"  value="danger"  label="Danger"></el-option>
                         </el-select>
 
-                        <br/>
-                        <el-select v-model="configSwitch.column" class="select-success" placeholder="Selecciona el tam colum" style="width: 100%;"> 
-                        <el-option class="text-dark" value="col-3" label="col-3" ></el-option>
+                        <br/><br/>
+                        
+                        <label>Tamaño columna</label>
+                        <el-select v-model="configSwitch.column" class="select-success" label="Tamaño Columna" placeholder="Selecciona el tam colum" style="width: 100%;"> 
+                            <el-option class="text-dark" value="col-3" label="col-3" ></el-option>
                             <el-option class="text-dark" value="col-4" label="col-4" ></el-option>
                             <el-option class="text-dark" value="col-5" label="col-5" ></el-option>
                             <el-option class="text-dark" value="col-6" label="col-6" ></el-option>
@@ -62,6 +64,7 @@
                             <el-option class="text-dark" value="col-11" label="col-11" ></el-option>
                             <el-option class="text-dark" value="col-12" label="col-12" ></el-option>
                         </el-select>
+                        
 
                         <br/>
                     </div>
@@ -75,17 +78,21 @@
                         <base-input v-model="configBoton2.text" label="Texto Boton" type="text"></base-input>
                         <base-input v-model="configBoton2.icono" label="Icono" type="text"></base-input>
                         
-                        <br/>
+                        
 
-                        <el-select v-model="configBoton2.class" class="select-success" placeholder="Selecciona una Clase" style="width 100%;">
+                        <label>Clase icono</label>
+                        <br/>
+                        <el-select v-model="configBoton2.class" label="Clase icono" class="select-success" placeholder="Selecciona una Clase" style="width 100%;">
                             <el-option class="text-success" value="success" label="Success"></el-option>
                             <el-option class="text-primary" value="primary" label="Primary" ></el-option> 
                             <el-option class="text-warning" value="warning" label="Warning" ></el-option>
                             <el-option class="text-danger"  value="danger"  label="Danger" ></el-option>
                         </el-select>
 
-                        <br/>
-                        <el-select v-model="configBoton2.column" class="select-success" placeholder="Selecciona el tam colum" style="width: 100%;"> <el-option class="text-dark" value="col-3" label="col-3" ></el-option>
+                        <br/><br/>
+
+                        <label>Tamaño columna</label>
+                        <el-select v-model="configBoton2.column" label="Tamaño Columna" class="select-success" placeholder="Selecciona el tam colum" style="width: 100%;"> <el-option class="text-dark" value="col-3" label="col-3" ></el-option>
                             <el-option class="text-dark" value="col-4" label="col-4" ></el-option>
                             <el-option class="text-dark" value="col-5" label="col-5" ></el-option>
                             <el-option class="text-dark" value="col-6" label="col-6" ></el-option>
@@ -96,14 +103,18 @@
                             <el-option class="text-dark" value="col-11" label="col-11" ></el-option>
                             <el-option class="text-dark" value="col-12" label="col-12" ></el-option>
                         </el-select>
+
+                        <br/>
+
                     </div>
 
                     <!-- Formularios tipo indicador-->
                     <div v-if="widgetTipo == 'indicador'">
                         <base-input v-model="configIndicador.variableFullName" label="Var Name" type="text"></base-input>
                         <base-input v-model="configIndicador.icono" label="Icono" type="text"></base-input>
-                        <br/>
 
+                        <label>Clase icono</label>
+                        <br/>
                         <el-select v-model="configIndicador.class" class="select-success" placeholder="Selecciona una Clase" style="width 100%;">
                             <el-option class="text-success" value="success" label="Success"></el-option>
                             <el-option class="text-primary" value="primary" label="Primary" ></el-option> 
@@ -112,7 +123,8 @@
                         </el-select>
 
                         <br/>
-                        <el-select v-model="configIndicador.column" class="select-success" placeholder="Selecciona el tam colum" style="width: 100%;">
+                        <label class="mt-3">Tamaño columna</label>
+                        <el-select v-model="configIndicador.column" class="select-success" label="Tamaño Columna" placeholder="Selecciona el tam colum" style="width: 100%;">
                             <el-option class="text-dark" value="col-3" label="col-3" ></el-option>
                             <el-option class="text-dark" value="col-4" label="col-4" ></el-option>
                             <el-option class="text-dark" value="col-5" label="col-5" ></el-option>
@@ -142,29 +154,79 @@
             </div>
 
             <!--Boton de Añadir-->
-            <div class="row pull-right">
-                <div class="cpl-12">
-                    <base-button native-type="submit" @click="addNewWidget()" type="primary" class="mb-3" size="lg" >
+            <div class="row pull-right mr-2">
+                <div class="cpl-11">
+                    <base-button native-type="submit" @click="addNewWidget()" type="primary" class="mb-3 ml-2" size="lg" >
                         Añadir Widget
                     </base-button>
                 </div>
             </div>
+        </card>
+        <!-- FIN Configuracion Widgwts-->
 
-            <!--Previsualizador Dashboard-->
-            <!--el campo key es una variable unica que identifica al widget cojer el id cuandos e tenga la base de datos-->
-            <div v-for="(widget, index) in widgets" :key="widget.variable" :class="[widget.column]">
-                <i aria-hidden="true" class="fa fa-tash pull-right text-warning"
-                    @click="deleteWidget(index)"
+        <h3 v-if="widgets.length > 0">Pre visualizacion</h3>
+        <!--Previsualizador Dashboard -->
+        <!--el campo key es una variable unica que identifica al widget cojer el id cuandos e tenga la base de datos-->
+        <div class="row" v-if="widgets.length > 0">
+            <div v-for="(widget, index) in widgets" :key="widget.index" :class="[widget.column]">
+                <i aria-hidden="false" class="fa fa-trash text-warning pull-right mr-2"
+                    @click="borarWidgetPreview(index)"
                     style="margin-bottom: 10px;"></i>
                 
                 <IotBoton v-if="widget.widget == 'boton'" :config="widget"></IotBoton>
                 <IotIndicador v-if="widget.widget == 'indicador'" :config="widget"></IotIndicador>
                 <IoTGraficaNum v-if="widget.widget == 'graficoNum'" :config="widget"></IoTGraficaNum>
                 <IotSwitch v-if="widget.widget== 'switch'" :config="widget"></IotSwitch>
-
             </div>
+        </div>
+        <!--FIN Previsualizador Dashboard -->
 
+        <!--Guardar la plantilla -->
+        
+        <card v-if="widgets.length > 0">
+            <div slot="header">
+                <h4 class="card-title">Guardar Plantilla</h4>
+            </div>
+            <div class="row">
+                <base-input v-model="plantillaNombre" label="Nombre de la plantilla" type="text" class="col-4"></base-input>
+                <base-input v-model="plantillaDescripcion" label="Descripcion de la plantilla" type="text" class="col-8"></base-input>
+            </div>
+            <!--Boton de Guardar-->
+            <div class="row pull-right mr-2">
+                <div class="cpl-11">
+                    <base-button native-type="submit" @click="guardarPlantilla()" type="primary" class="mb-3" size="lg" >
+                        Guardar Plantilla
+                    </base-button>
+                </div>
+            </div>
         </card>
+        
+        <!-- Tabla de plantillas del usuario -->
+        <card>
+            <div slot="header">
+                <h4 class="card-title">Plantillas</h4>
+            </div>
+            <div class="row">
+                <el-table :data="plantillas">
+                    <el-table-column min min-width="50" label="#" align="center">
+                        <div slot-scope="{row, $index}">{{$index+1}}</div>
+                    </el-table-column>
+                    <el-table-column prop="plantillaNombre" label="Nombre"></el-table-column>
+                    <el-table-column prop="descripcion" label="Descripcion"></el-table-column>
+                    <el-table-column prop="widgets.length" label="Num. Widgets"></el-table-column>
+                    <el-table-column label="Acciones">
+                        <div slot-scope="{row, $index }">
+                            <el-tooltip content="Delete" effect="light" :open-delay="300" placement="top">
+                                <base-button type="danger" icon size="sm" class="btn-link" @click="borrarPlantilla(row)">
+                                    <i class="tim-icons icon-simple-remove"></i>
+                                </base-button>
+                            </el-tooltip>
+                        </div>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </card>
+
 
     </div>
 </template>
@@ -195,65 +257,65 @@ export default{
     IotSwitch
     },
     middleware: 'autentificador',
-        data(){
-            return {
-                widgets: [],
-                templates: [],
-                widgetTipo: "",
-                templateName: "",
-                templateDescipcion: "",
+    data(){
+        return {
+            widgets: [],
+            plantillas: [],
+            widgetTipo: "",
+            plantillaNombre: "",
+            plantillaDescripcion: "",
 
-                ncConfig:{
-                    userId: "EjemploUserId",
-                    dispositvoSelecionado: {
-                        name: "Casa",
-                        dID: "49894"
-                    },
-                    variableFullName: "temperatura",
-                    variable: "varname",
-                    unidad: "Watios",
-                    class: "success",
-                    column: "col-12",
-                    decimales: 2,
-                    widget: "graficoNum",
-                    icono: "fa-bath",
-                    chartTimeAgo: 1566,
-                    demo: true
+            ncConfig:{
+                userId: "EjemploUserId",
+                dispositvoSelecionado: {
+                    name: "Casa",
+                    dID: "49894"
                 },
-                configBoton2:{
-                    userId: 'userid',
-                    dispositvoSelecionado: {
-                        name: "Hogar",
-                        dID: "9874",
-                    },
-                    variableFullName: "Pump",
-                    text: "send",
-                    variable: "varname",
-                    icono: "fa-sun",
-                    column: 'col-6',
-                    widget: "boton",
-                    message: "{'fanstatus': 'stop'}"
+                variableFullName: "temperatura",
+                variable: "varname",
+                unidad: "Watios",
+                class: "success",
+                column: "col-12",
+                decimales: 2,
+                widget: "graficoNum",
+                icono: "fa-bath",
+                chartTimeAgo: 1566,
+                demo: true
+            },
+            configBoton2:{
+                userId: 'userid',
+                dispositvoSelecionado: {
+                    name: "Hogar",
+                    dID: "9874",
                 },
-                configIndicador: {
-                    userId: 'userid',
-                    dispositvoSelecionado: {
-                        name: "Hogar",
-                        dID: "8674",
-                    },
-                    variableFullName: "Pump",
-                    variable: "ClaveUnicaString",
-                    icono: "fa-sun",
-                    column: 'col-6',
-                    widget: "indicador",
-                    class: 'success'
+                variableFullName: "Pump",
+                text: "send",
+                variable: "varname",
+                icono: "fa-sun",
+                column: 'col-6',
+                widget: "boton",
+                message: "{'fanstatus': 'stop'}"
+            },
+            configIndicador: {
+                userId: 'userid',
+                dispositvoSelecionado: {
+                    name: "Hogar",
+                    dID: "8674",
                 },
-                configSwitch: {
-                    userId: "userid",
-                    dispositvoSelecionado: {
-                        name: "Granja",
-                        dID: "9798"
-                    },
-                    variableFullName: "Bombilla",
+                variableFullName: "Pump",
+                variable: "ClaveUnicaString",
+                icono: "fa-sun",
+                column: 'col-6',
+                widget: "indicador",
+                class: 'success'
+            },
+            configSwitch: {
+                userId: "userid",
+                dispositvoSelecionado: {
+                    name: "Granja",
+                    dID: "9798"
+                },
+                variableFullName: "Bombilla",
                     variable: "varname",
                     class: "danger",
                     widget: "switch",
@@ -261,45 +323,47 @@ export default{
                     column: "col-6"
                 },
 
-                //Pruebas de maquetacion widgets
-                // value:false,
-
-                // configBoton:{
-                //     userId: 'userid',
-                //     dispositvoSelecionado: {
-                //         name: "Hogar",
-                //         dID: "9874",
-                //         templateName: "Senores",
-                //         templateID: "46468464",
-                //         saverRule:false,
-                //     },
-                //     variableFullName: "Pump",
-                //     variable: "ClaveUnicaString",
-                //     icono: "fa-sun",
-                //     column: 'col-6',
-                //     widgetTipo: "indicator",
-                //     class: 'danger',
-                //     message: "{'fanstatus': 'stop'}"
-                // } ,
-                // config: {
-                //     userId: 'userid',
-                //     dispositvoSelecionado: {
-                //         name: "Hogar",
-                //         dID: "9874",
-                //         templateName: "Senores",
-                //         templateID: "46468464",
-                //         saverRule:false,
-                //     },
-                //     variableFullName: "Pump",
-                //     variable: "ClaveUnicaString",
-                //     icono: "fa-sun",
-                //     column: 'col-6',
-                //     widgetTipo: "indicator",
-                //     class: 'danger'
-                // }
-                //FIN Pruegas maquetacion widgets
+            //Pruebas de maquetacion widgets
+            // value:false,
+            // configBoton:{
+            //     userId: 'userid',
+            //     dispositvoSelecionado: {
+            //         name: "Hogar",
+            //         dID: "9874",
+            //         templateName: "Senores",
+            //         plantillaID: "46468464",
+            //         saverRule:false,
+            //     },
+            //     variableFullName: "Pump",
+            //     variable: "ClaveUnicaString",
+            //     icono: "fa-sun",
+            //     column: 'col-6',
+            //     widgetTipo: "indicator",
+            //     class: 'danger',
+            //     message: "{'fanstatus': 'stop'}"
+            // } ,
+            // config: {
+            //     userId: 'userid',
+            //     dispositvoSelecionado: {
+            //         name: "Hogar",
+            //         dID: "9874",
+            //         templateName: "Senores",
+            //         plantillaID: "46468464",
+            //         saverRule:false,
+            //     },
+            //     variableFullName: "Pump",
+            //     variable: "ClaveUnicaString",
+            //     icono: "fa-sun",
+            //     column: 'col-6',
+            //     widgetTipo: "indicator",
+            //     class: 'danger'
+            // }
+            //FIN Pruegas maquetacion widgets
 
             }
+        },
+        mounted(){
+            this.getPlantillas();
         },
         methods: {
             addNewWidget(){
@@ -329,8 +393,115 @@ export default{
                 }
                 return cadena;
             },
-            borarWidgetPreview(){
+            borarWidgetPreview(index){
                 this.widgets.splice(index, 1);
+            },
+            async guardarPlantilla(){
+                //Contruimos el header para sarle a la api
+                const headerAxios = {
+                    headers:{
+                        token: this.$store.state.auth.token
+                    }
+                };
+                console.log(headerAxios);
+
+                //Consutruimos el objeto a guardar
+                const toSend={
+                    plantilla:{
+                        plantillaNombre: this.plantillaNombre,
+                        descripcion: this.plantillaDescripcion,
+                        widgets: this.widgets
+                    }
+                }
+
+                
+                try {
+                    //Llamamos a la API
+                    const res =await this.$axios.post("/plantilla", toSend, headerAxios)
+                    if(res.data.status == "success"){
+                        //notificamos que todo ha ido bien
+                        this.$notify({
+                            type: "success",
+                            icon: "tim-icons icon-check-2",
+                            message: "¡La plantilla sea creado correctamente!"
+                        });
+                        this.getPlantillas();
+                    }
+                } catch (error) {
+                    console.log(error);
+                    //notificamos el error
+                    this.$notify({
+                        type: "danger",
+                        icon: "tim-icons icon-alert-circle-exc",
+                        message: "Ha ocurrido un error al guardar."
+                    })
+                    return;
+                }
+            },
+            async getPlantillas(){
+                //Contruimos el header para sarle a la api
+                const headerAxios = {
+                    headers:{
+                        token: this.$store.state.auth.token
+                    }
+                };
+                console.log("Hola desd eget plantillas");
+                try {
+                    //Llamamos a la API
+                    const respuestaPlantillas =await this.$axios.get("/plantilla", headerAxios);
+                    
+                    console.log(respuestaPlantillas.data.data);
+                    console.log(this.plantillas);
+
+                    if(respuestaPlantillas.data.status == "success"){
+                        this.plantillas = respuestaPlantillas.data.data;
+                    }
+                } catch (error) {
+                    console.log(error);
+                    //notificamos el error
+                    this.$notify({
+                        type: "danger",
+                        icon: "tim-icons icon-alert-circle-exc",
+                        message: "Ha ocurrido un error al obtener las plantillas."
+                    })
+                    return;
+                }
+            },
+            async borrarPlantilla(plantilla){
+                //Contruimos el header para sarle a la api
+                const headerAxios = {
+                    headers:{
+                        token: this.$store.state.auth.token
+                    },
+                    params:{
+                        plantillaID: plantilla._id
+                    }
+                };
+                console.log(headerAxios);
+                
+                try {
+                    //Llamamos a la API
+                    const respuestaBorrado =await this.$axios.delete("/plantilla", headerAxios);
+
+                    if(respuestaBorrado.data.status == "success"){
+                        //notificamos que todo ha ido bien
+                        this.$notify({
+                            type: "success",
+                            icon: "tim-icons icon-check-2",
+                            message: "¡La plantilla sea borrado correctamente!"
+                        });
+                        this.getPlantillas();
+                    }
+                } catch (error) {
+                    console.log(error);
+                    //notificamos el error
+                    this.$notify({
+                        type: "danger",
+                        icon: "tim-icons icon-alert-circle-exc",
+                        message: "Ha ocurrido un error al borrar las plantillas."
+                    })
+                    return;
+                }
             },
             //Pruebas de maquetacion widgets
             enviarDatos(){
@@ -340,7 +511,7 @@ export default{
                 }
                 this.$nuxt.$emit('userid/9874/ClaveUnicaString/adata', toSend);
             }
-            //FIN Pruegas maquetacion widgets
+            //FIN Pruebas maquetacion widgets
         }
     }
 </script>
