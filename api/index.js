@@ -21,6 +21,9 @@ appExpres.use(express.urlencoded({
 appExpres.use('/api', require('./rutas/dispositivos.js'))
 appExpres.use('/api', require('./rutas/usuarios.js'))
 appExpres.use('/api', require('./rutas/plantillas.js'))
+appExpres.use('/api', require('./rutas/webhooks.js'))
+appExpres.use('/api', require('./rutas/emqxApi.js'))
+appExpres.use('/api', require('./rutas/alarmas.js'))
 module.exports=appExpres;
 
 //listener 

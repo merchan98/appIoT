@@ -1,12 +1,25 @@
 // requires
 const express = require('express');
 const router = express.Router();
-const {checkAuth} = require('../middlewares/autenfificadortoken.js')
+const {checkAuth} = require('../middlewares/autenfificadortoken.js');
+const axios = require('axios');
+
+//Autentificacion para la API
+const auth ={
+    auth:{
+        username: 'admin',
+        password: 'emqxsecret'
+    }
+}
+
 
 //Modelos
 import Dispositivo from '../modelos/dispositivo.js';
+import ReglaGuardado from "../modelos/emqxReglaGuardado";
+import ReglaAlarma from '../modelos/emqxReglasAlarmas.js';
+import Plantilla from '../modelos/plantilla.js';
     
-
+/*
 //test
 // router.get("/testing", (req, res) => {
 //     // res.send("Primera test endpoints");
@@ -20,7 +33,7 @@ import Dispositivo from '../modelos/dispositivo.js';
 //     };
 
 //     res.json(toReturn);
-// });
+// }); */
 
 
 //peticion de dispostivos
@@ -32,16 +45,38 @@ router.get("/dispositivo", checkAuth, async (req, res) => {
         
         //busqueda de dispostivos
         const dispositivos = await Dispositivo.find({ userID: userID });
+
+        //Comvertimos a array el objeto dispositvos
+        //var dispositivosArray= Object.assign({},dispositivos);
+        var dispositivosArray = JSON.parse(JSON.stringify(dispositivos)); //Manera Ruda
         
+        //busqueda de la reglas de Guardados
+        const reglasGuardado = await getReglasGuardado(userID);
+
+        //busqueda de la reglas de Guardados
+        const plantillas = await getPlantillas(userID);
+        
+        //busqueda de Alarmas
+        const alarmas = await getAlarmas(userID);
+
+        //Cruce de tablas para añadir las reglas de guardado al dispositvo
+        dispositivosArray.forEach((dispositivo, index) =>{
+            
+            dispositivo.reglaGuardado = reglasGuardado.filter(reglaGuardado => reglaGuardado.dID == dispositivo.dID)[0];
+            console.log(dispositivo.reglaGuardado);
+            dispositivo.plantilla = plantillas.filter(plantilla => plantilla._id == dispositivo.plantillaID)[0];
+            dispositivo.alarmas = alarmas.filter(alarma => alarma.dID == dispositivo.dID);
+        })
+        // console.log("LLEGO HASTA AQUI2");
         //Respuesta
         const toSend = {
             status: "Success",
-            data: dispositivos
+            data: dispositivosArray
         };
         res.json(toSend);
 
     } catch (error) {
-        console.log("Error Listado de Dispostivos");
+        console.log("Error Listado de Dispostivos dispostivo.js");
         // console.log(error);
 
         const toSend = {
@@ -59,7 +94,7 @@ router.post("/dispositivo", checkAuth , async (req, res) => {
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         var nuevoDispositvo = req.body.nuevoDispositivo;
-
+        console.log(nuevoDispositvo);
         //Salida Prueba
         // console.log("SALIDA nuevoDispositvo POST");
         // console.log(nuevoDispositvo);
@@ -67,12 +102,15 @@ router.post("/dispositivo", checkAuth , async (req, res) => {
         //Añadimos los campos que faltan
         nuevoDispositvo.userID = userID;
         nuevoDispositvo.fechaCreacion = Date.now();
+        
+        //Creamos la Regla
+        await crearReglaGuardado(userID, nuevoDispositvo.dID, false);
 
         //Creamos el dispostivo
         const dispositivo = await Dispositivo.create( nuevoDispositvo );
-
+        console.log(dispositivo);
         //Seleccionamos el nuevo dispositivo
-        seleccionarDispositivo(userID, nuevoDispositvo.dID);
+        await seleccionarDispositivo(userID, nuevoDispositvo.dID);
 
         //Respuesta
         const toSend = {
@@ -102,8 +140,12 @@ router.delete("/dispositivo", checkAuth , async (req, res) => {
         //const dispID = req.body.dispID//Si viene post
         // console.log(userID);
         // console.log(req.query.dispID);
+
+        //Borrar la regla de Guardado
+        await borrarReglaGuardado(dispID);
+
         //Falta la funcion para seleccionar otro dispsitivo si el boorado esta select
-        seleccionarDispositivoBorrado(userID, dispID);
+        await seleccionarDispositivoBorrado(userID, dispID);
 
         //Busqueda del que hay que eliminar
         //Se compueba que el dispostivo es del usuario tambien
@@ -134,7 +176,7 @@ router.put("/dispositivo", checkAuth , async  (req, res) => {
     const userID = req.datosUsuarios._id;
     const dispID = req.body.dID;
 
-    if (seleccionarDispositivo(userID, dispID)) {
+    if (await seleccionarDispositivo(userID, dispID)) {
         const toSend = {
             status: "Success"
             
@@ -149,8 +191,39 @@ router.put("/dispositivo", checkAuth , async  (req, res) => {
     }
 });
 
-//Funciones
+//Update del status de la regla de guardado
+router.put("/reglaGuardado", checkAuth , async  (req, res) => {
+    try {
+        //Constantes y variables
+        const regla = req.body.regla;
 
+        console.log(regla);
+
+        //Llamaos a la funcion para actualizr la regla
+        var respuesta = await updateStatusReglaGuardado(regla.emqxReglaID, regla.status);
+
+        //Respuesta
+        if (respuesta != false) {
+            const toSend = {
+                status: "success"
+            };
+            
+            return res.json(toSend);
+        } else {
+            const toSend = {
+                status: "error"
+            };
+            return res.status(400).json(toSend); //REvisar el numero de error
+        }
+    } catch (error) {
+        console.log("Error en al actualizar el status de la regla");
+        console.log(error);
+    }
+});
+
+
+
+//Funciones
 async function seleccionarDispositivo(userIDrecib, dispIDrecib) {
     try {
         //Lo ponemos todo en falso
@@ -170,17 +243,19 @@ async function seleccionarDispositivo(userIDrecib, dispIDrecib) {
 
 async function seleccionarDispositivoBorrado(userIDrecib, dispIDrecib) {
     try {
-        console.log("HOLA desde SELECT DISPO Borradp");
+        
         //Cojemos el dispositivo seleccionado
         const dispositivoRecibido = await Dispositivo.find({ userID: userIDrecib, dID: dispIDrecib });
-        console.log(dispositivoRecibido[0].seleccionado);
+        
         if (dispositivoRecibido[0].seleccionado) {
             //Cojemos 1 dipositivo
             const dispositivo = await Dispositivo.find({ userID: userIDrecib });
-            console.log("DESNTRO DEL IF");
-            console.log(dispositivo);
-            //Ponemos 1 dispositivo en verdadero
-            const result2 = await Dispositivo.updateOne({ dID: dispositivo[0].dID, userID: userIDrecib }, { seleccionado: true });
+            
+            if(dispositivo.length > 0){ //Por si no hay mas dispsitvivos
+                 //Ponemos 1 dispositivo en verdadero
+                const result2 = await Dispositivo.updateOne({ dID: dispositivo[0].dID, userID: userIDrecib }, { seleccionado: true });
+            }
+            
         }
         
     
@@ -192,6 +267,167 @@ async function seleccionarDispositivoBorrado(userIDrecib, dispIDrecib) {
     }
     
 }
+
+
+//Funciones De Reglas Guardados
+
+//Peticion de reglas
+async function getReglasGuardado(userID){
+    try {
+        const reglas = await ReglaGuardado.find({userID: userID});
+        return reglas;
+    } catch (error) {
+        console.log("Error al obtener las Reglas");
+        return false;
+    }
+}
+
+//Creación de Regla Guardados
+async function crearReglaGuardado(userID,dID,status){
+    try {
+        //Url de la api
+        const url = "http://localhost:8085/api/v4/rules";
+
+        //Contrucion del topic
+        const topic= userID + "/" + dID + "/+/sdata";
+
+        //Sentencia SQL
+        const rawsql= "SELECT topic, payload FROM \""+topic+"\" WHERE payload.save=1";
+    
+        //Objeto nueva regla
+        var nuevaRegla = {
+            rawsql: rawsql,
+            actions: [{
+                name: "data_to_webserver",
+                params:{
+                    $resource: global.recursoGuardado.id,
+                    payload_tmpl: '{"userID":"'+userID+'",payload":${payload},"topic":"${topic}"}'
+                }
+            }],
+            description: "GUARDAR - REGLA",
+            enabled: status
+        };
+        
+        //Llamada a la API para guardar la regla
+        const respuesta =await axios.post(url, nuevaRegla, auth)
+
+        if(respuesta.status === 200 && respuesta.data.data){
+            console.log(respuesta.data.data);
+
+            await ReglaGuardado.create({
+                userID: userID,
+                dID: dID,
+                emqxReglaID: respuesta.data.data.id,
+                status: status
+            });
+            return true;
+        }else{
+            //Algo no salio bien
+            console.log("Algo no salió bien al crear la regla de Guardado");
+            return false;
+        }
+
+    } catch (error) {
+        console.log("Error al crear al regla de Guardado");
+        console.log(error);
+        return false; 
+    }
+}
+
+//Actualizar status de una regla
+async function updateStatusReglaGuardado(emqxReglaID, status){
+    try {
+        //Url de la api
+        const url = "http://localhost:8085/api/v4/rules/"+emqxReglaID;
+
+        //Objeto con el nuevo status
+        const nuevaRegla ={enabled:status}
+
+        //Llamada a la API de EMQX
+        const respuesta = await axios.put(url, nuevaRegla, auth);
+        //console.log(respuesta);
+        if(respuesta.status === 200 && respuesta.data.data){
+            //Actualizamos la regal en la BD
+            await  ReglaGuardado.updateOne({emqxReglaID: emqxReglaID},{status:status})
+            
+            console.log("Se actuliazado el status de la regla".green);
+
+            //Respuesta
+            const toSend={
+                status: "success",
+                action: "update"
+            };
+            return toSend;
+        }else{
+            //REvisar#######
+            console.log("Error al actualizar la regla de Guardado en EMQX");
+            return false
+        }
+
+    } catch (error) {
+        console.log("Error al actualizar el status de la Regla de Guardado");
+        console.log(error);
+    }
+}
+
+
+//Borrar una regla 
+async function borrarReglaGuardado(dID){
+    try {
+        //Buscamos la regla por el ID del sipositivo pasado como parametro
+        const regla = await ReglaGuardado.findOne({dID: dID});
+
+        if(regla != null){
+            //Url de la api
+            const url = "http://localhost:8085/api/v4/rules/"+ regla.emqxReglaID;
+
+            //Llamada a al API de EMQX
+            const emqxRegla = await axios.delete(url, auth);
+
+            //Llamada a la BD para borrar la regla
+            const reglaborrada = await ReglaGuardado.deleteOne({dID: dID});
+
+            //REVISAR SALIDA
+            return reglaborrada;
+        }else{
+            console.log("No hay ninguna regla con ese ID");
+            return false;
+        }
+
+    } catch (error) {
+        console.log("Error al borrar la Regla de Guardado");
+        console.log(error);
+        return false;
+    }
+}
+
+//Funiones sobre Plantillas
+
+//Peticion de plantillas
+async function getPlantillas(userID){
+    try {
+        const plantillas = await Plantilla.find({userID: userID});
+        return plantillas;
+    } catch (error) {
+        console.log("Error al obtener las Plantillas");
+        return false;
+    }
+}
+
+//Funiones sobre Alarmas
+
+//Peticion de alarmas
+async function getAlarmas(userID){
+    try {
+        const alarmas = await ReglaAlarma.find({userID: userID});
+        return alarmas;
+    } catch (error) {
+        console.log("Error al obtener las Alarmas");
+        return false;
+    }
+}
+
+
 
 
 //export

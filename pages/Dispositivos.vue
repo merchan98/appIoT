@@ -12,23 +12,16 @@
                     <div class="form row">
                         <base-input v-model="nuevoDispositivo.nombre" label="Nombre de dispositvo" type="text" placeholder="Temperatura casa" class="col-4"></base-input>
                         <base-input v-model="nuevoDispositivo.dID" label="ID de dispositvo" type="text" placeholder="AS6255946"  class="col-4"></base-input>
-                        <!-- <base-input class="col-md-4" label="Plantilla">
-                                <select id="inputPlatilla" class="form-control">
-                                    <option selected>Choose...</option>
-                                    <option>Platilla 1</option>
-                                    <option>Platilla 2</option>
-                                </select>
-                        </base-input> -->
                         <div class="col-4">
                             <label> Plantillas </label>
                             <div class="row ">
                                 <el-select v-model="indexSeleccionadoPlantilla" label="Plantillas" placeholder="Selecciona la plantilla" class="select-primary">
-                                    <el-option v-for="(plantilla, index) in plantillas" class="text-dark" :key="plantilla._id" :value="index" :label="plantilla.plantillaNombre"></el-option>
+                                    <el-option v-for="(plantilla, index) in plantillas" class="text-dark" :value="index" :key="plantilla._id"  :label="plantilla.plantillaNombre"></el-option>
                                 </el-select>
                             </div>
                         </div>
                     </div>
-                    <base-button @click="crearNuevoDispositivo()" type="primary" native-type="Submit">Enviar</base-button>
+                    <base-button @click="crearNuevoDispositivo()" type="primary" native-type="Submit" class="pull-right">Enviar</base-button>
                 </form>
             </card>
         </div>
@@ -55,10 +48,10 @@
                         <div slot-scope="{row, $index }">
                             <!-- {{ $index +1}} -->
                             <el-tooltip content="Guardar en Base de datos">
-                                <base-switch @click="updateRuleGuardarDatos($index)" :value="row.saverRule" type="primariy" on-text="On" off-text="Off"></base-switch>
+                                <base-switch @click="updateReglaGuardarDatos(row.reglaGuardado)" :value="row.reglaGuardado.status" type="primariy" on-text="On" off-text="Off"></base-switch>
                             </el-tooltip>
-                            {{ row.saverRule}}
-                            <el-tooltip content="Delete" effect="light" :open-delay="300" placement="top">
+                            <!-- {{ row.reglaGuardado}} -->
+                            <el-tooltip content="Borrar" effect="light" :open-delay="300" placement="top">
                                 <base-button type="danger" icon size="sm" class="btn-link" @click="deleteDispositivo(row)">
                                     <i class="tim-icons icon-simple-remove"></i>
                                 </base-button>
@@ -99,7 +92,7 @@ export default {
                 nombre: "",
                 dID: "",
                 plantillaID:"",
-                planitillaNombre: ""
+                plantillaNombre: ""
             }
             // dispositivos: [
             //     {
@@ -144,7 +137,7 @@ export default {
                     dispID: dispositvo.dID
                 }
             };
-            console.log(headerAxios);
+
             //Lllamamos a la api
             this.$axios.delete("/dispositivo", headerAxios)
                 .then(res => {
@@ -153,7 +146,7 @@ export default {
                         this.$notify({
                             type: "success",
                             icon: "tim-icons icon-check-2",
-                            message: "¡El dispostivo ha sido eliminado correctamente!"
+                            message: "¡El dispositivo ha sido eliminado correctamente!"
                         });
                         //volvemos a cargar la lista de dipostivos
                         // console.log("Hola desde delete ");
@@ -211,7 +204,7 @@ export default {
                 this.$notify({
                     type: "warning",
                     icon: "tim-icons icon-alert-circle-exc",
-                    message: "El nombre del dispostivo esta vacio."
+                    message: "El nombre del dispositivo esta vacio."
                 });
                 return;
             }
@@ -220,7 +213,7 @@ export default {
                 this.$notify({
                     type: "warning",
                     icon: "tim-icons icon-alert-circle-exc",
-                    message: "El ID del dispostivo esta vacio."
+                    message: "El ID del dispositivo esta vacio."
                 });
                 return;
             }
@@ -242,16 +235,17 @@ export default {
             };
             console.log(headerAxios);
 
-            //Ponemos el nombre de la plantilla seleccionada en el dispostivo
+            //Ponemos el nombre de la plantilla seleccionada en el dispositivo
             this.nuevoDispositivo.plantillaID = this.plantillas[this.indexSeleccionadoPlantilla]._id;
-            this.nuevoDispositivo.planitillaNombre = this.plantillas[this.indexSeleccionadoPlantilla].planitillaNombre;
+            this.nuevoDispositivo.plantillaNombre = this.plantillas[this.indexSeleccionadoPlantilla].plantillaNombre;
 
             const toSend ={
                 nuevoDispositivo: this.nuevoDispositivo
             }
             //Realizamos la peticion a la API
-
-            this.$axios.post("/dispostivo", toSend, headerAxios)
+            console.log("ANtes de llamar a cracion en vue");
+            console.log(this.nuevoDispositivo);
+            this.$axios.post("/dispositivo", toSend, headerAxios)
                 .then(res =>{
                     if(res.data.status == "success"){
                         //vaciamos el formulario
@@ -266,7 +260,7 @@ export default {
                         this.$notify({
                             type: "success",
                             icon: "tim-icons icon-check-2",
-                            message: "¡El dispostivo ha sido añadido correctamente!"
+                            message: "¡El dispositivo ha sido añadido correctamente!"
                         });
                         return;
                     }
@@ -285,8 +279,54 @@ export default {
                             this.showNotify("danger","Error");
                         }
                 });
+        },
+        updateReglaGuardarDatos(regla){
+            //Creamos un copia del archivo
+            var reglaCopia = Object.assign({},regla);
+
+            //Cambiamos el valor del status al contrario
+            reglaCopia.status = !reglaCopia.status;
+
+            //Preparamos los datos para llamar a la API para actualizar el status
+            const toSend = {
+                regla: reglaCopia
+            };
+            const headerAxios={
+                headers:{
+                    token: this.$store.state.auth.token
+                }
+            };
+
+            //Llamada a la API
+            this.$axios
+                .put("reglaGuardado", toSend, headerAxios)
+                .then(res =>{
+                    if(res.data.status == "success"){
+                        //Recargamos la tabla
+                        this.$store.dispatch("getDispositivos");
+
+                        //notificamos que todo ha ido bien
+                        // this.$notify({
+                        //     type: "success",
+                        //     icon: "tim-icons icon-check-2",
+                        //     message: "¡El status del dispositivo ha sido modificado correctamente!"
+                        // });
+                        return;
+                    }
+                })
+                .catch(error =>{
+                    console.log(error);
+                    //Notificamos el error
+                    this.$notify({
+                        type: "warning",
+                        icon: "tim-icons icon-alert-circle-exc",
+                        message: "Error al modificar el status del dispositivo"
+                    });
+                    return;
+                });
+
+
         }
-        
     }
 };
 </script>

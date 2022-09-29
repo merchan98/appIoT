@@ -2,7 +2,7 @@
     <card>
         <template slot="header">
             
-            <h5 class="card-category">{{config.dispositvoSelecionado.name}} - {{config.variableFullName}}</h5>
+            <h5 class="card-category">{{config.dispositvoSelecionado.name}} - {{config.variableNombreCompleto}}</h5>
             <h3 class="card-title">
                 <i class="fa " :class="[config.icono, getIconColorClass()]" aria-hidden="true" style="font-size: 30px;"></i>
                 <base-switch @click="value = !value; enviarValor()" :value="value" type="primary"

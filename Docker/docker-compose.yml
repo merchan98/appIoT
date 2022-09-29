@@ -3,8 +3,8 @@ version: "3.8"
 volumes:
     vol-emqx-data:
         name: foo-emqx-data
-    # vol-emqx-etc:
-    #     name: foo-emqx-etc
+    vol-emqx-etc:
+        name: foo-emqx-etc
     vol-emqx-log:
         name: foo-emqx-log
 
@@ -15,7 +15,7 @@ services:
         image: mongo:4.4
         restart: always
         environment:
-            TZ: "Europa/España/Madrid"
+            TZ: "Europe/Madrid"
             MONGO_INITDB_ROOT_USERNAME: "UserDev"
             MONGO_INITDB_ROOT_PASSWORD: "PasswordDev"
         volumes:
@@ -25,7 +25,7 @@ services:
 
     emqx:
         container_name: emqx
-        image: emqx:4.3
+        image: emqx/emqx:4.2.4
         restart: always
         ports:
             - 18083:18083
@@ -38,24 +38,32 @@ services:
 
         volumes:
             - vol-emqx-data:/opt/emqx/data
-            #   - vol-emqx-etc:/opt/emqx/etc
+            - vol-emqx-etc:/opt/emqx/etc
             - vol-emqx-log:/opt/emqx/log
 
         links:
             - mongo
 
-        environment:
+        #QUITAR EN PRODUCCION SOLO DEV
+        extra_hosts:
+            - "localhost:192.168.1.51"
 
-            EMQX_NAME:
+        environment:
+            EMQX_NAME: appIoT
             EMQX_HOST: 127.0.0.1
 
-            TZ: "Europa/España/Madrid"
 
             # DEFAULT DASH PASS
             EMQX_DASHBOARD__DEFAULT_USER__PASSWORD: "dashpassemqx"
 
+            # DEFAULT APP SECRET
+            EMQX_MANAGEMENT__DEFAULT_APPLICATION__SECRET: "emqxsecret"
+
             EMQX_ALLOW_ANONYMOUS: "false"
             EMQX_NOMATCH: "deny"
+
+            # USUARIOS POR DEFECTO
+            EMQX_DASHBOARD__DEFAULT_USER__LOGIN: "admin"
 
             # MONGO CONNECTION
             EMQX_AUTH__MONGO__TYPE: single
@@ -87,6 +95,8 @@ services:
             EMQX_AUTH__MONGO__ACL_QUERY__COLLECTION: "emqxauthrules"
             EMQX_AUTH__MONGO__ACL_QUERY__SELECTOR: "username=%u"
 
-            EMQX_LOADED_PLUGINS: "emqx_recon,emqx_retainer,emqx_management,emqx_dashboard, emqx_auth_mongo"
+            EMQX_LOADED_PLUGINS: "emqx_recon,emqx_retainer,emqx_management,emqx_dashboard,emqx_auth_mongo"
 
             EMQX_LISTENER__TCP__EXTERNAL__MAX_CONNECTIONS: 1000
+
+            TZ: "Europe/Madrid"

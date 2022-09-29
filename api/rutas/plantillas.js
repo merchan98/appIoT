@@ -77,7 +77,7 @@ router.delete("/plantilla", checkAuth, async(req,res) =>{
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         const plantillaID = req.query.plantillaID
-
+        
         //Busqueda del que hay que eliminar
         //Se compueba que el dispostivo es del usuario tambien
         const resBorrado = await Plantilla.deleteOne({ userID: userID, _id: plantillaID });

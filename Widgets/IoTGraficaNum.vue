@@ -3,7 +3,7 @@
 
         <template slot="header">
             <h5 class="card-category pull right">{{getTiempoRecibido((HoraActual -time)/1000)}}</h5>
-            <h5 class="card-category">{{config.dispositvoSelecionado.name}} - {{config.variableFullName}}</h5>
+            <h5 class="card-category">{{config.dispositvoSelecionado.name}} - {{config.variableNombreCompleto}}</h5>
             <h3 class="card-title">
                 <i class="fa " :class="[config.icono, getIconColorClass()]" aria-hidden="true" style="font-size: 30px;"></i>
                 <span>{{value.toFixed(config.decimales)}} {{config.unidad}}</span>
@@ -104,7 +104,7 @@
                 deep: true,
                 handler(){
                     setTimeout(() => {
-                        this.opcionesGrafico.series[0].name =this.config.variableFullName +" "+ this.config.unidad;
+                        this.opcionesGrafico.series[0].name =this.config.variableNombreCompleto +" "+ this.config.unidad;
                         this.updateClassColor();
                         window.dispatchEvent(new Event('resize'));
                     }, 1000);
@@ -136,7 +136,7 @@
                 if(c=="danger") {
                     this.opcionesGrafico.series[0].color = "#fd5d93";
                 }
-                this.opcionesGrafico.series[0].name = this.config.variableFullName +" "+ this.config.unidad;
+                this.opcionesGrafico.series[0].name = this.config.variableNombreCompleto +" "+ this.config.unidad;
             },
 
             getChartData(){

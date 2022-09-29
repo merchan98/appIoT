@@ -30,7 +30,7 @@
                     <!-- Formularios-->
                     <!-- Formularios tipo grafica-->
                     <div v-if="widgetTipo == 'graficoNum'">
-                        <base-input v-model="ncConfig.variableFullName" label="Var Name" type="text"></base-input>
+                        <base-input v-model="ncConfig.variableNombreCompleto" label="Var Name" type="text"></base-input>
                         <base-input v-model="ncConfig.unidad" label="Unidad" type="text"></base-input>
                         <base-input v-model="ncConfig.icono" label="Icono" type="text"></base-input>
                         <base-input v-model="ncConfig.chartTimeAgo" label="Perido de tiempo" type="number"></base-input>
@@ -38,7 +38,7 @@
 
                     <!-- Formularios tipo switch-->
                     <div v-if="widgetTipo == 'switch'">
-                        <base-input v-model="configSwitch.variableFullName" label="Var Name" type="text"></base-input>
+                        <base-input v-model="configSwitch.variableNombreCompleto" label="Var Name" type="text"></base-input>
                         <base-input v-model="configSwitch.icono" label="Icono" type="text"></base-input>
                         
                         <label>Clase icono</label>
@@ -73,7 +73,7 @@
 
                     <!-- Formularios tipo boton-->
                     <div v-if="widgetTipo == 'boton'">
-                        <base-input v-model="configBoton2.variableFullName" label="Var Name" type="text"></base-input>
+                        <base-input v-model="configBoton2.variableNombreCompleto" label="Var Name" type="text"></base-input>
                         <base-input v-model="configBoton2.message" label="Mensage a enviar" type="text"></base-input>                        
                         <base-input v-model="configBoton2.text" label="Texto Boton" type="text"></base-input>
                         <base-input v-model="configBoton2.icono" label="Icono" type="text"></base-input>
@@ -110,7 +110,7 @@
 
                     <!-- Formularios tipo indicador-->
                     <div v-if="widgetTipo == 'indicador'">
-                        <base-input v-model="configIndicador.variableFullName" label="Var Name" type="text"></base-input>
+                        <base-input v-model="configIndicador.variableNombreCompleto" label="Var Name" type="text"></base-input>
                         <base-input v-model="configIndicador.icono" label="Icono" type="text"></base-input>
 
                         <label>Clase icono</label>
@@ -271,7 +271,7 @@ export default{
                     name: "Casa",
                     dID: "49894"
                 },
-                variableFullName: "temperatura",
+                variableNombreCompleto: "temperatura",
                 variable: "varname",
                 unidad: "Watios",
                 class: "success",
@@ -288,7 +288,7 @@ export default{
                     name: "Hogar",
                     dID: "9874",
                 },
-                variableFullName: "Pump",
+                variableNombreCompleto: "Pump",
                 text: "send",
                 variable: "varname",
                 icono: "fa-sun",
@@ -302,7 +302,7 @@ export default{
                     name: "Hogar",
                     dID: "8674",
                 },
-                variableFullName: "Pump",
+                variableNombreCompleto: "Pump",
                 variable: "ClaveUnicaString",
                 icono: "fa-sun",
                 column: 'col-6',
@@ -315,7 +315,7 @@ export default{
                     name: "Granja",
                     dID: "9798"
                 },
-                variableFullName: "Bombilla",
+                variableNombreCompleto: "Bombilla",
                     variable: "varname",
                     class: "danger",
                     widget: "switch",
@@ -334,7 +334,7 @@ export default{
             //         plantillaID: "46468464",
             //         saverRule:false,
             //     },
-            //     variableFullName: "Pump",
+            //     variableNombreCompleto: "Pump",
             //     variable: "ClaveUnicaString",
             //     icono: "fa-sun",
             //     column: 'col-6',
@@ -351,7 +351,7 @@ export default{
             //         plantillaID: "46468464",
             //         saverRule:false,
             //     },
-            //     variableFullName: "Pump",
+            //     variableNombreCompleto: "Pump",
             //     variable: "ClaveUnicaString",
             //     icono: "fa-sun",
             //     column: 'col-6',
@@ -389,7 +389,7 @@ export default{
                 var cadena="";
                 var caracteres="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!·$%&";
                 for (var i=0;i<longitud;i++){
-                    cadena += cadena.charAt(Math.floor(Math.random()*caracteres.length));
+                    cadena += caracteres.charAt(Math.floor(Math.random()*caracteres.length));
                 }
                 return cadena;
             },
@@ -446,6 +446,7 @@ export default{
                     }
                 };
                 console.log("Hola desd eget plantillas");
+                console.log(headerAxios);
                 try {
                     //Llamamos a la API
                     const respuestaPlantillas =await this.$axios.get("/plantilla", headerAxios);

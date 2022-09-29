@@ -1,7 +1,7 @@
 <template>
     <card>
         <div slot="header">
-            <h4 class="card-title">{{config.dispositvoSelecionado.name}} - {{config.variableFullName}}</h4>
+            <h4 class="card-title">{{config.dispositvoSelecionado.name}} - {{config.variableNombreCompleto}}</h4>
         </div>
 
         <i class="fa " :class="[config.icono, getIconColorClass() ]" style="font-size: 30px "></i>
@@ -24,7 +24,7 @@ export default {
             //         plantillaID: "46468464",
             //         saverRule:false,
             //     },
-            //     variableFullName: "Pump",
+            //     variableNombreCompleto: "Pump",
             //     variable: "ClaveUnicaString",
             //     icono: "fa-sun",
             //     column: 'col-6',

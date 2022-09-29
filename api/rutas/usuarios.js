@@ -63,7 +63,7 @@ router.post("/login", async (req, res) => {
     if (bcrypt.compareSync(req.body.password, usuario.password)) {
         //Borramos al contraseña por se un dato sensible
         usuario.set('password', undefined, { strict: false });
-
+        usuario.set('email', undefined, { strict: false });
         //Genero el token JWT
         const token = jwt.sign({ datosUsuario: usuario}, 'IoteESelmassegurodesdeel98', {expiresIn: 60*60*24*30});
 
