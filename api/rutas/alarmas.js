@@ -25,69 +25,81 @@ const auth ={
 
 //Crear una alarma
 router.post('/reglaAlarma', checkAuth, async (req,res) => {
+    try {
+        //Constantes y variables
+        var nuevaRegla=req.body.regla;
+        nuevaRegla.userID = req.datosUsuarios._id;
 
-    //Constantes y variables
-    var nuevaRegla=req.body.regla;
-    nuevaRegla.userID = req.datosUsuarios._id;
+        //Llamamos a la funcion crear Alarma
+        var respuesta = await crearReglaAlarma(nuevaRegla);
 
-    //Llamamos a la funcion crear Alarma
-    var respuesta = await crearReglaAlarma(nuevaRegla);
-
-    if (respuesta){
-        const response ={
-            status:"success"
+        if (respuesta){
+            const response ={
+                status:"success"
+            }
+            return res.json(response);
+        }else{
+            const response ={
+                status: "error",
+            }
+            return res.status(500).json(response);
         }
-        return res.json(response);
-    }else{
-        const response ={
-            status: "error",
-        }
-        return res.status(500).json(response);
+    } catch (error) {
+        console.log("Error al añadir la regla Alarma");
+        console.log(error);
     }
 })
 
 //Actualizar estado de una Alarma
 router.put('/reglaAlarma', checkAuth, async (req,res) => {
-
-    //Constantes y variables
-    var nuevaRegla=req.body.regla;
-
-    //Llamamos a la funcion crear Alarma
-    var respuesta = await updateStatusAlarma(nuevaRegla.emqxReglaID, nuevaRegla.status);
-
-    if (respuesta){
-        const response ={
-            status:"success"
+    try {
+        //Constantes y variables
+        var nuevaRegla=req.body.regla;
+    
+        //Llamamos a la funcion crear Alarma
+        var respuesta = await updateStatusAlarma(nuevaRegla.emqxReglaID, nuevaRegla.status);
+    
+        if (respuesta){
+            const response ={
+                status:"success"
+            }
+            return res.json(response);
+        }else{
+            const response ={
+                status: "error",
+            }
+            return res.json(response);
         }
-        return res.json(response);
-    }else{
-        const response ={
-            status: "error",
-        }
-        return res.json(response);
+    } catch (error) {
+        console.log("Error al actualizar el estado de la regla Alarma");
+        console.log(error);
     }
 })
 
 
 //Borrar una alarma
 router.delete('/reglaAlarma', checkAuth, async (req,res) => {
-
-    //Constantes y variables
-    var emqxReglaID = req.query.emqxReglaID;
-
-    //Llamamos a la funcion crear Alarma
-    var respuesta = await borrarReglaAlarma(emqxReglaID);
-
-    if (respuesta){
-        const response ={
-            status:"success"
+    try {
+        //Constantes y variables
+        var emqxReglaID = req.query.emqxReglaID;
+    
+        //Llamamos a la funcion crear Alarma
+        var respuesta = await borrarReglaAlarma(emqxReglaID);
+    
+        if (respuesta){
+            const response ={
+                status:"success"
+            }
+            return res.json(response);
+        }else{
+            const response ={
+                status: "error",
+            }
+            return res.json(response);
         }
-        return res.json(response);
-    }else{
-        const response ={
-            status: "error",
-        }
-        return res.json(response);
+    } catch (error) {
+        console.log("Error al borrar la regla Alarma");
+        console.log(error);
     }
 })
 

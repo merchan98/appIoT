@@ -83,7 +83,8 @@
         
       </base-dropdown>
       <!-- FIN DE MIS AÑADIDOS-->
-      <!--<base-dropdown
+      <!-- Boton de la derecha -->
+      <base-dropdown
         tag="li"
         :menu-on-right="!$rtl.isRTL"
         title-tag="a"
@@ -91,24 +92,23 @@
         title-classes="nav-link"
         menu-classes="dropdown-navbar"
       >
-        <template
-          slot="title"
-        >
+        <template slot="title">
           <div class="photo"><img src="img/mike.jpg" /></div>
           <b class="caret d-none d-lg-block d-xl-block"></b>
-          <p class="d-lg-none">Log out</p>
+          <p @click="logOut()" class="d-lg-none">Log out</p>
         </template>
-        <li class="nav-link">
+
+        <!-- <li class="nav-link">
           <a href="#" class="nav-item dropdown-item">Profile</a>
         </li>
         <li class="nav-link">
           <a href="#" class="nav-item dropdown-item">Settings</a>
-        </li>
-        <div class="dropdown-divider"></div>
+        </li> 
+        <div class="dropdown-divider"></div>-->
         <li class="nav-link">
-          <a href="#" class="nav-item dropdown-item">Log out</a>
+          <a href="#" @click="logOut()" class="nav-item dropdown-item">Log out</a>
         </li>
-      </base-dropdown> -->
+      </base-dropdown>
     </ul>
   </base-nav>
 </template>
@@ -156,8 +156,10 @@ export default {
     this.$store.dispatch("getDispositivos");
     //Para recibir el indice del dispositivo Seleccionado
     this.$nuxt.$on("dispositivoSelecionadoIndex", this.updateDispositivoSeleccionadoIndex)
-    //para recibir las notifaciones
-    this.$store.dispatch("getNotificaciones");
+
+  },
+  beforeDestroy() {
+    this.$nuxt.$off("dispositivoSelecionadoIndex");
   },
   methods: {
     capitalizeFirstLetter(string) {
@@ -223,33 +225,46 @@ export default {
         })
 
     },
+    //Log out
+    logOut(){
+      //Notificamos por conolsa el deslogueo
+      console.log("logout");
+      //Limpiamos el local storage par aeliminar el token
+      localStorage.clear()
+      //Limpiamos nuestro store
+      const authVacio= {};
+      this.$store.commit("setAuth", authvacio)
+      //Redirigimos al login
+      window.location.href ="/login";
+
+    },
     //UNIX A FECHA (NO es mia)
     unixToDate(ms) {
-        var d = new Date(parseInt(ms)), 
-          yyyy = d.getFullYear(),
-          mm = ('0' + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
-          dd = ('0' + d.getDate()).slice(-2), // Add leading 0.
-          hh = d.getHours(),
-          h = hh,
-          min = ('0' + d.getMinutes()).slice(-2), // Add leading 0.
-          ampm = 'AM',
-          time;
+      var d = new Date(parseInt(ms)),
+        yyyy = d.getFullYear(),
+        mm = ("0" + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
+        dd = ("0" + d.getDate()).slice(-2), // Add leading 0.
+        hh = d.getHours(),
+        h = hh,
+        min = ("0" + d.getMinutes()).slice(-2), // Add leading 0.
+        ampm = "AM",
+        time;
 
-        if (hh > 12) {
-          h = hh - 12;
-          ampm = 'PM';
-        } else if (hh === 12) {
-          h = 12;
-          ampm = 'PM';
-        } else if (hh == 0) {
-          h = 12;
-        }
+      if (hh > 12) {
+        h = hh - 12;
+        ampm = "PM";
+      } else if (hh === 12) {
+        h = 12;
+        ampm = "PM";
+      } else if (hh == 0) {
+        h = 12;
+      }
 
-        // ie: 2013-02-18, 8:35 AM	
-        time = dd + '/' + mm + '/' + yyyy + ', ' + h + ':' + min + ' ' + ampm;
+      // ie: 2013-02-18, 8:35 AM
+      time = dd + "/" + mm + "/" + yyyy + ", " + h + ":" + min + " " + ampm;
 
-        return time;
-      },
+      return time;
+    },
   }
 };
 </script>

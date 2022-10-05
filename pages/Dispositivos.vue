@@ -48,7 +48,7 @@
                         <div slot-scope="{row, $index }">
                             <!-- {{ $index +1}} -->
                             <el-tooltip content="Guardar en Base de datos">
-                                <base-switch @click="updateReglaGuardarDatos(row.reglaGuardado)" :value="row.reglaGuardado.status" type="primariy" on-text="On" off-text="Off"></base-switch>
+                                <base-switch v-if="row.reglaGuardad !== null" @click="updateReglaGuardarDatos(row.reglaGuardado)" :value="row.reglaGuardado.status" type="primariy" on-text="On" off-text="Off"></base-switch>
                             </el-tooltip>
                             <!-- {{ row.reglaGuardado}} -->
                             <el-tooltip content="Borrar" effect="light" :open-delay="300" placement="top">

@@ -5,6 +5,7 @@ const {checkAuth} = require('../middlewares/autenfificadortoken.js')
 
 //Modelos
 import Plantilla from '../modelos/plantilla.js';
+import Dispositivo from '../modelos/dispositivo.js';
 
 //Guardar Plantilla
 router.post("/plantilla", checkAuth, async (req,res) =>{
@@ -77,6 +78,18 @@ router.delete("/plantilla", checkAuth, async(req,res) =>{
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         const plantillaID = req.query.plantillaID
+
+        //Comprobamsooq ue no tien dispositvos en uso
+        const dispositivos = await Dispositivo.find({userID: userID, plantillaID: plantillaID});
+
+        if(dispositivos.length > 0){
+            const toSend={
+                status: "fail",
+                error: "Plantilla en uso"
+            }
+            return res.json(response);
+        }
+
         
         //Busqueda del que hay que eliminar
         //Se compueba que el dispostivo es del usuario tambien

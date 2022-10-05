@@ -12,12 +12,14 @@ const auth ={
     }
 }
 
-
 //Modelos
 import Dispositivo from '../modelos/dispositivo.js';
 import ReglaGuardado from "../modelos/emqxReglaGuardado";
 import ReglaAlarma from '../modelos/emqxReglasAlarmas.js';
 import Plantilla from '../modelos/plantilla.js';
+import ReglaEmqxAuth from '../modelos/emqxAuth.js';
+import { RuntimeGlobals } from 'webpack';
+
     
 /*
 //test
@@ -89,7 +91,6 @@ router.get("/dispositivo", checkAuth, async (req, res) => {
 
 //Creacion del dispostivos
 router.post("/dispositivo", checkAuth , async (req, res) => {
-    
     try {
         //Constantes y variables
         const userID = req.datosUsuarios._id;
@@ -144,12 +145,36 @@ router.delete("/dispositivo", checkAuth , async (req, res) => {
         //Borrar la regla de Guardado
         await borrarReglaGuardado(dispID);
 
+        //Borramos todas la reglas de alarma
+        await borrarAlarmas(userID, dispID);
+
+        //Borramos todas las credeciales mqtt
+        await borrarMqttCredenciales(dispID);
+
         //Falta la funcion para seleccionar otro dispsitivo si el boorado esta select
         await seleccionarDispositivoBorrado(userID, dispID);
 
         //Busqueda del que hay que eliminar
         //Se compueba que el dispostivo es del usuario tambien
         const resBorrado = await Dispositivo.deleteOne({ userID: userID, dID: dispID });
+        
+        
+        //Buscamos si esta seleccioando si selecciona el primero de la lista
+        const dispostivos = await Dispositivo.find({ userID: userID});
+
+        if (dispostivos.length >= 1) {
+            var encontrado = false;
+            dispostivos.forEach(dispostivos => {
+                if (dispostivos.seleccionado == true) {
+                    encontrado = true;
+                }
+            });
+
+            if (!encontrado) {
+                await Dispositivo.updateMany({ userID: userID }, { seleccionado: false });
+                await Dispositivo.updateOne({ userID: userID, dID: dispostivos[0].dID },{ seleccionado: true });
+            }
+        }
 
         //Respuesta (Añadir info del dipostivo borrado en el futuro)
         const toSend = {
@@ -172,22 +197,28 @@ router.delete("/dispositivo", checkAuth , async (req, res) => {
 
 //Seleccionamos el nuevo dispostivo
 router.put("/dispositivo", checkAuth , async  (req, res) => {
-    //Constantes y variables
-    const userID = req.datosUsuarios._id;
-    const dispID = req.body.dID;
-
-    if (await seleccionarDispositivo(userID, dispID)) {
-        const toSend = {
-            status: "Success"
+    try {
+        //Constantes y variables
+        const userID = req.datosUsuarios._id;
+        const dispID = req.body.dID;
+    
+        if (await seleccionarDispositivo(userID, dispID)) {
+            const toSend = {
+                status: "Success"
+                
+            };
             
-        };
+            return res.json(toSend);
+        } else {
+            const toSend = {
+                status: "error"
+            };
+            return res.status(500).json(toSend);
+        }
         
-        return res.json(toSend);
-    } else {
-        const toSend = {
-            status: "error"
-        };
-        return res.status(500).json(toSend);
+    } catch (error) {
+        console.log("Error al seleccionar un dispositivo");
+        console.log(error);
     }
 });
 
@@ -312,7 +343,7 @@ async function crearReglaGuardado(userID,dID,status){
         const respuesta =await axios.post(url, nuevaRegla, auth)
 
         if(respuesta.status === 200 && respuesta.data.data){
-            console.log(respuesta.data.data);
+            //console.log(respuesta.data.data);
 
             await ReglaGuardado.create({
                 userID: userID,
@@ -427,11 +458,53 @@ async function getAlarmas(userID){
     }
 }
 
+//Funciones de borrado
 
+//Borrado de Alarmas
+async function borrarAlarmas(userID, dispID){
+    try {
+        const reglas= await ReglaAlarma.find({ userID: userID, dID: dispID})
 
+        //Si hay alarmas las enocntramos y borramos una a una toda en EMQX
+        if(reglas.length >0){
+            asyncForEach(reglas, async regla => {
+                const url = "http://localhost:8085/api/v4/rules/" + regla.emqxReglaID;
+                const respuesta = await axios.delete(url, auth);
+            });
+            
+            //borramos todas las alarmas en mongo
+            await ReglaAlarma.deleteMany({ userID: userID, dID: dispID});
+        }
+        return true;
+    } catch (error) {
+        console.log("Error al borrar las Alarmas");
+        console.log(error);
+        return "error";
+    }
+}
+
+//Borrado de credenciales MQTT
+async function borrarMqttCredenciales(dispID){
+    try {
+        //borramos todas las credenciales en mongo
+        await ReglaAlarma.deleteMany({ dID: dispID, tipo: "dispositivo"});
+
+        return true;
+    } catch (error) {
+        console.log("Error al borrar las credenciales MQTT");
+        console.log(error);
+        return "error";
+    }
+}
+
+// Funcion for ech asincrona fuente:
+// thanks to Sebastien Chopin - Nuxt Creator :)
+// https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
+async function asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array);
+    }
+}
 
 //export
 module.exports = router;
-
-
-

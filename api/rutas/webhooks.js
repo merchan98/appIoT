@@ -254,6 +254,10 @@ function startMqttClient(){
         console.log("MQTT CONEXION -> FAIL; \n".red);
         console.log(error);
     });
+    client.on('message', function (topic, message) {
+        console.log("Menseje desde el topic"+ topic +" => ");
+        console.log(message.toString()); 
+    });
 };
 
 //Enviar notificacion Mqtt

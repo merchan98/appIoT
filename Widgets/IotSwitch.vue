@@ -2,7 +2,7 @@
     <card>
         <template slot="header">
             
-            <h5 class="card-category">{{config.dispositvoSelecionado.name}} - {{config.variableNombreCompleto}}</h5>
+            <h5 class="card-category">{{config.dispositivoSeleccionado.name}} - {{config.variableNombreCompleto}}</h5>
             <h3 class="card-title">
                 <i class="fa " :class="[config.icono, getIconColorClass()]" aria-hidden="true" style="font-size: 30px;"></i>
                 <base-switch @click="value = !value; enviarValor()" :value="value" type="primary"
@@ -58,7 +58,7 @@
 
             enviarValor(){
                 const toSend ={
-                    topic: this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/actdata",
+                    topic: this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/actdata",
                     msg: {
                         svalue: this.value//this.config.message
                     }

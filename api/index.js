@@ -24,6 +24,8 @@ appExpres.use('/api', require('./rutas/plantillas.js'))
 appExpres.use('/api', require('./rutas/webhooks.js'))
 appExpres.use('/api', require('./rutas/emqxApi.js'))
 appExpres.use('/api', require('./rutas/alarmas.js'))
+appExpres.use('/api', require('./rutas/dataprovaider.js'))
+
 module.exports=appExpres;
 
 //listener 

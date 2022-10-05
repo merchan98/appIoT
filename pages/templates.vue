@@ -33,7 +33,7 @@
                         <base-input v-model="ncConfig.variableNombreCompleto" label="Var Name" type="text"></base-input>
                         <base-input v-model="ncConfig.unidad" label="Unidad" type="text"></base-input>
                         <base-input v-model="ncConfig.icono" label="Icono" type="text"></base-input>
-                        <base-input v-model="ncConfig.chartTimeAgo" label="Perido de tiempo" type="number"></base-input>
+                        <base-input v-model="ncConfig.tablaTiempo" label="Perido de tiempo" type="number"></base-input>
                     </div>
 
                     <!-- Formularios tipo switch-->
@@ -194,7 +194,7 @@
             <!--Boton de Guardar-->
             <div class="row pull-right mr-2">
                 <div class="cpl-11">
-                    <base-button native-type="submit" @click="guardarPlantilla()" type="primary" class="mb-3" size="lg" >
+                    <base-button native-type="submit" @click="guardarPlantilla()" type="primary" class="mb-3" size="lg" :disabled="widgets.length == 0" >
                         Guardar Plantilla
                     </base-button>
                 </div>
@@ -267,7 +267,7 @@ export default{
 
             ncConfig:{
                 userId: "EjemploUserId",
-                dispositvoSelecionado: {
+                dispositivoSeleccionado: {
                     name: "Casa",
                     dID: "49894"
                 },
@@ -279,12 +279,12 @@ export default{
                 decimales: 2,
                 widget: "graficoNum",
                 icono: "fa-bath",
-                chartTimeAgo: 1566,
+                tablaTiempo: 1566,
                 demo: true
             },
             configBoton2:{
                 userId: 'userid',
-                dispositvoSelecionado: {
+                dispositivoSeleccionado: {
                     name: "Hogar",
                     dID: "9874",
                 },
@@ -298,7 +298,7 @@ export default{
             },
             configIndicador: {
                 userId: 'userid',
-                dispositvoSelecionado: {
+                dispositivoSeleccionado: {
                     name: "Hogar",
                     dID: "8674",
                 },
@@ -311,7 +311,7 @@ export default{
             },
             configSwitch: {
                 userId: "userid",
-                dispositvoSelecionado: {
+                dispositivoSeleccionado: {
                     name: "Granja",
                     dID: "9798"
                 },
@@ -323,11 +323,12 @@ export default{
                     column: "col-6"
                 },
 
-            //Pruebas de maquetacion widgets
+            //Pruebas de maquetacion widgets{
+            //}
             // value:false,
             // configBoton:{
             //     userId: 'userid',
-            //     dispositvoSelecionado: {
+            //     dispositivoSeleccionado: {
             //         name: "Hogar",
             //         dID: "9874",
             //         templateName: "Senores",
@@ -344,7 +345,7 @@ export default{
             // } ,
             // config: {
             //     userId: 'userid',
-            //     dispositvoSelecionado: {
+            //     dispositivoSeleccionado: {
             //         name: "Hogar",
             //         dID: "9874",
             //         templateName: "Senores",
@@ -358,6 +359,7 @@ export default{
             //     widgetTipo: "indicator",
             //     class: 'danger'
             // }
+
             //FIN Pruegas maquetacion widgets
 
             }
@@ -426,6 +428,9 @@ export default{
                             message: "¡La plantilla sea creado correctamente!"
                         });
                         this.getPlantillas();
+                        this.widgets=[];
+                        this.plantillaNombre = "";
+                        this.plantillaDescripcion = "";
                     }
                 } catch (error) {
                     console.log(error);
@@ -483,6 +488,16 @@ export default{
                 try {
                     //Llamamos a la API
                     const respuestaBorrado =await this.$axios.delete("/plantilla", headerAxios);
+
+                    //Por si laplantilla tiene dispostivos 
+                    if(respuestaBorrado.data.status == "fail" && res.data.error== "Plantilla en uso"){
+                        //notificamos que todo ha ido mail
+                        this.$notify({
+                            type: "danger",
+                            icon: "tim-icons icon-alert-circle-exc",
+                            message: plantilla.nombre +"esta en uso. Borra primero los dispositvios vincualdo con ella."
+                        })
+                    }
 
                     if(respuestaBorrado.data.status == "success"){
                         //notificamos que todo ha ido bien

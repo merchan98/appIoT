@@ -3,7 +3,7 @@
 
         <template slot="header">
             <h5 class="card-category pull right">{{getTiempoRecibido((HoraActual -time)/1000)}}</h5>
-            <h5 class="card-category">{{config.dispositvoSelecionado.name}} - {{config.variableNombreCompleto}}</h5>
+            <h5 class="card-category">{{config.dispositivoSeleccionado.name}} - {{config.variableNombreCompleto}}</h5>
             <h3 class="card-title">
                 <i class="fa " :class="[config.icono, getIconColorClass()]" aria-hidden="true" style="font-size: 30px;"></i>
                 <span>{{value.toFixed(config.decimales)}} {{config.unidad}}</span>
@@ -30,20 +30,21 @@
                 time: Date.now(),
                 HoraActual: Date.now(),
                 estaMontado: false,
+                topic: "",
                 opcionesGrafico:{
-                    creditos:{
+                    credits:{
                         enabled: false
                     },
-                    Grafica: {
+                    chart: {
                         renderTo: 'container',
                         defaultSeriesType: 'line',
                         backgoundColor: 'rgba(1,1,1,1)',                    
                     },
-                    titulo: {
+                    title: {
                         texto: ""
                     },
                     xAxis: {
-                        tipo: 'datetime',
+                        type: 'datetime',
                         labels: {
                             style: {
                                 color: '#d4d2d3'
@@ -51,7 +52,7 @@
                         }
                     },
                     yAxis: {
-                        titulo: {
+                        title: {
                             text: ""
                         },
                         labels: {
@@ -62,7 +63,7 @@
                         }
                     },
                     // Opciones de pintado de la grafica
-                    plotOpciones: {
+                    plotOptions: {
                         series:{
                             label: {
                                 connectorAllowed: FileSystemHandle
@@ -71,8 +72,8 @@
                         }
                     },
                     series: [{
-                        nombre: '',
-                        datos: [],
+                        name: '',
+                        data: [],
                         color: "#e14eca"
                     }],
                     legend: {
@@ -87,7 +88,7 @@
                             },
                             chartOptions: {
                                 legend: {
-                                    layaout: 'hotizontal',
+                                    layaout: 'horizontal',
                                     aling:'center',
                                     verticalAling: 'bottom'
                                 }
@@ -98,12 +99,25 @@
 
             };
         },
-        reloj: {
+        watch: {
             config: {
                 inmediato: true,
                 deep: true,
                 handler(){
                     setTimeout(() => {
+                        //PAra que al cmabio de dispositvio se cambia tb todo
+                        //valor a 0
+                        this.value = 0;
+                        //Nos desubcribimos del topic antiguo
+                        this.$nuxt.$off(this.topic + "/sdata");
+                        //Nos subcribimos la nuevo
+                        this.topic = this.config.userId + '/' + this.config.selectedDevice.dId + '/' + this.config.variable;
+                        this.$nuxt.$on(this.topic + "/sdata", this.procesReceivedData);
+                        //Recinciamos los datos de la tabal
+                        this.chartOptions.series[0].data = [];
+                        //Conseguimos los datos de nuevo dle servidor
+                        this.getChartData();
+
                         this.opcionesGrafico.series[0].name =this.config.variableNombreCompleto +" "+ this.config.unidad;
                         this.updateClassColor();
                         window.dispatchEvent(new Event('resize'));
@@ -112,11 +126,12 @@
             }
         },
         mounted() {
-            const topic = this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/sdata";
-            this.$nuxt.$on(topic,this.procesadoDatosRecibidos);
             this.getTiempoActual();
-            this.getChartData();
             this.updateClassColor();    
+        },
+        beforeDestroy(){
+
+            this.$nuxt.$off(this.topic,this.procesadoDatosRecibidos);
         },
         methods:{
 
@@ -148,10 +163,13 @@
 
                 const axiosHeaders = {
                     headers: {
-                        token: $nuxt.$store.state.auth.accessToken,
+                        token: $nuxt.$store.state.auth.token, //CREO QUE ES UN ERROR
                     },
-                    params: { dID: this.config.dispositvoSelecionado.dID, variable: this.config.variable,
-                                charTimeAgo: this.config.chatTimeAgo}
+                    params: { 
+                        dID: this.config.dispositivoSeleccionado.dID, 
+                        variable: this.config.variable,
+                        tablaTiempo: this.config.tablaTiempo
+                    }
                 }
                 this.$axios.get("/get-small-charts-data", axiosHeaders)
                     .then(res => {
@@ -169,9 +187,9 @@
                         this.estaMontado=true;
                         return;
                     })
-                    .catch(e =>{
+                    .catch(error =>{
                         console.log("Salida IoTGraficaNum 2");
-                        console.log(e);
+                        console.log(error);
                         return;
                     });
             },
@@ -183,6 +201,12 @@
             procesadoDatosRecibidos(data){
                 this.time = Date.now();
                 this.value = data.value;
+                //Para recargar si llegan nuevos datos (Retraso de 1 segundo por si acaso)
+                setTimeout(() =>{
+                    if(data.save == 1){
+                        this.getChartData();
+                    }
+                },1000)
             },
 
             getTiempoActual(){

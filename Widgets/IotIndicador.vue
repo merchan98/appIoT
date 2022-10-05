@@ -1,7 +1,7 @@
 <template>
     <card>
         <div slot="header">
-            <h4 class="card-title">{{config.dispositvoSelecionado.name}} - {{config.variableNombreCompleto}}</h4>
+            <h4 class="card-title">{{config.dispositivoSeleccionado.name}} - {{config.variableNombreCompleto}}</h4>
         </div>
 
         <i class="fa " :class="[config.icono, getIconColorClass() ]" style="font-size: 30px "></i>
@@ -14,10 +14,11 @@ export default {
     props: ['config'],
     data(){
         return{
+            topic: "",
             value: TextTrackCueList//false, //valor del icono
             // config: {
             //     userId: 'userid',
-            //     dispositvoSelecionado: {
+            //     dispositivoSeleccionado: {
             //         name: "Hogar",
             //         dID: "9874",
             //         templateName: "Senores",
@@ -33,26 +34,48 @@ export default {
             // }
         }
     },
+    watch:{
+        config:{
+            inmmediate: true,
+            deep: true,
+            handler(){
+                setTimeout(() =>{
+                    //Reicniamos el valor
+                    this.value=false;
+
+                    //Nos desubcrubimos del topic antiguo
+                    this.$nuxt.$off(this.topic);
+
+                    //Nos subcrubumos el topic nuevo
+                    this.topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/sdata";
+                    this.$nuxt.$on(this.topic,this.procesadoDatosRecibidos)
+
+                })
+            }
+        }
+    },
     mounted(){
         //this.$nuxt.$on('widget-tipic', this.procesadoDatosRecibidos)
-        const topic = this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/sdata";
-        
-        console.log("Salida de IOTIndicador");
-        console.log(topic);
-
-        this.$nuxt.$on(topic,this.procesadoDatosRecibidos)
+        this.topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/sdata";
+        // console.log("Salida de IOTIndicador");
+        // console.log(this.topic);
+        this.$nuxt.$on(this.topic,this.procesadoDatosRecibidos)
     },
     beforeDestroy(){
         // Para que la subcion al topico se destruya ya que 
         // el mounted se ejecuta cada vez que visitas la pagina
-        this.$nuxt.$off(this.config.userId + "/" + this.config.dispositvoSelecionado.dID + "/" + this.config.variable + "/sdata");
+        this.$nuxt.$off(this.topic + "/sdata");
     },
     methods: {
 
         procesadoDatosRecibidos(data){
-            console.log("Recibido IoTIndicator");
-            console.log(data);
-            this.value = data.value;
+            try {
+                console.log("Recibido IoTIndicator");
+                console.log(data);
+                this.value = data.value;
+            } catch (error) {
+                console.log(error);
+            }
         },
 
         getIconColorClass(){

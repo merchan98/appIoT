@@ -11,6 +11,7 @@
 <script>
 
     export default {
+        middleware: 'autentificador',
         mounted() {
             $nuxt.$router.push("/dashboard");
         },
