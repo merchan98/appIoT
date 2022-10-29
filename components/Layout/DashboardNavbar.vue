@@ -22,9 +22,9 @@
     <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
 
       <!-- MIS AÑADIDOS-->
-      <el-select class="select-success" placeholder="Selecionar Dispostivo" @change="seleccionarDispositivo()" v-model="dispositivoSeleccionado">
+      <!-- <el-select class="select-success" placeholder="Selecionar Dispostivo" @change="seleccionarDispositivo()" v-model="dispositivoSeleccionado">
         <el-option v-for="(dispositivo, index) in $store.state.dispositivos" :value="index" :label="dispositivo.nombre" :key="dispositivo._id"></el-option>
-      </el-select>
+      </el-select> -->
       <!-- FIN DE MIS AÑADIDOS-->
 
       <!-- <div class="search-bar input-group" @click="searchModalVisible = true">

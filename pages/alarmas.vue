@@ -1,6 +1,15 @@
 <template>
     <div>
-        <h2> Alarmas/Reglas</h2>
+
+        <div class="row justify-content-between">
+            <h2> Alarmas/Reglas</h2>
+        <br/>
+            <div class="mr-2">
+                <el-select class="select-success" placeholder="Selecionar Dispostivo" @change="seleccionarDispositivo()" v-model="dispositivoSeleccionado">
+                    <el-option v-for="(dispositivo, index) in $store.state.dispositivos" :value="index" :label="dispositivo.nombre" :key="dispositivo._id"></el-option>
+                </el-select>
+            </div>
+        </div>
         
         <!--Formulacio Crear Alarma-->
         <div class="row">
@@ -11,14 +20,14 @@
                     </div>
 
                     <!-- Formulario -->
-                    <form class="form-row">
+                    <form class="form-row" v-if="dispositivoSeleccionado != null">
                         <div class="col-2">
                             <label class="colFormLabel">Variable</label>
                             <el-select  required class="select-success mt-0" label="Variaible" placeholder="Variaible" v-model="widgetsSelecionadoIndex"  style="margin-top: 25px">
-                                <el-option v-for="(widget, index2) in $store.state.dispositivoSeleccionado.plantilla.widgets" :value="index2" :key="index2" class="text-dark" :label="widget.variableNombreCompleto"></el-option>
+                                <el-option v-for="(widget, index2) in this.$store.state.dispositivos[this.dispositivoSeleccionado].tipoDispositivo.variables" :value="index2" :key="index2" class="text-dark" :label="widget.nombre"></el-option>
                                 
                             </el-select>
-                            
+                            <!-- {{this.$store.state.dispositivos[this.dispositivoSeleccionado].tipoDispositivo.variables}} -->
                         </div>
                         <div class="col-2">
                             <label class="colFormLabel">Condicion</label>
@@ -43,10 +52,10 @@
                         <div class="col-3 mt-2">
                             <base-button @click="crearNuevaRegla()" native-type="submit" type="primary" class="mb-3" size="lg" :disabled="$store.state.dispositivos.lenght == 0" >
                                 Añadir Alarma
-                            </base-button>
+                            </base-button> 
                         </div>
                     </form>
-                </card>
+                </card> 
                 <!-- Por si no hay ningun dispositivo creado-->
                 <card v-else>
                     Selecciona un dispositvo para crear una alarma.
@@ -139,8 +148,18 @@ export default {
                 value: null,
                 condicion: null,
                 triggerTime: null
-            }
+            },
+            dispositivoSeleccionado: null //Mio
         }
+    },
+    mounted() {
+        this.$store.dispatch("getDispositivos");
+        //Para recibir el indice del dispositivo Seleccionado
+        this.$nuxt.$on("dispositivoSelecionadoIndex", this.updateDispositivoSeleccionadoIndex)
+
+    },
+    beforeDestroy() {
+        this.$nuxt.$off("dispositivoSelecionadoIndex");
     },
     methods:{
         crearNuevaRegla(){
@@ -180,10 +199,10 @@ export default {
             };
 
             //variables
-            this.nuevaRegla.dID = this.$store.state.dispositivoSeleccionado.dID;
-            this.nuevaRegla.dNombre = this.$store.state.dispositivoSeleccionado.nombre;
-            this.nuevaRegla.variableNombreCompleto= this.$store.state.dispositivoSeleccionado.plantilla.widgets[this.widgetsSelecionadoIndex].variableNombreCompleto;
-            this.nuevaRegla.variable = this.$store.state.dispositivoSeleccionado.plantilla.widgets[this.widgetsSelecionadoIndex].variable;
+            this.nuevaRegla.dID = this.$store.state.dispositivos[this.dispositivoSeleccionado].dID;
+            this.nuevaRegla.dNombre = this.$store.state.dispositivos[this.dispositivoSeleccionado].nombre;
+            this.nuevaRegla.variableNombreCompleto= this.$store.state.dispositivos[this.dispositivoSeleccionado].variableNombreCompleto;
+            this.nuevaRegla.variable = this.$store.state.dispositivos[this.dispositivoSeleccionado].tipoDispositivo.variables[this.widgetsSelecionadoIndex].nombre;
             this.nuevaRegla.status = false;
 
             //Preparamos los datos para llamar a la API p
@@ -315,6 +334,33 @@ export default {
                         message: "Ha ocurrido un error al borrar."
                     })
                 })
+        },
+        seleccionarDispositivo(){
+            //Selecionamos el dispositivo actual del array de la store
+            const dispositivo = this.$store.state.dispositivos[this.dispositivoSeleccionado];
+
+            //Montamos el header y el to send
+            const headerAxios ={
+                headers:{
+                token: this.$store.state.auth.token
+                }
+            }
+            const toSend={dID: dispositivo.dID}
+            console.log("Nuevo Disp selectcionado");
+            //Llamada a la API
+            this.$axios
+                .put("/dispositivo", toSend, headerAxios)
+                .then(res =>{
+                this.$store.dispatch("getDispositivos")
+                })
+                .catch(error =>{
+                console.log(error);
+                return;
+                })
+
+            },
+        updateDispositivoSeleccionadoIndex(index){
+            this.dispositivoSeleccionado = index;
         }
     }
 }

@@ -8,8 +8,11 @@ const dispositivoSchema = new Schema({
     dID: { type: String, required: [true], unique: true },
     nombre:{ type: String, required: [true] },
     seleccionado: { type: Boolean, required: [true], default: false },
-    plantillaID:{ type: String, required: [true] },
-    plantillaNombre:{ type: String, required: [true] },
+    plantillaID:{ type: String },
+    plantillas:{ type: Array },
+    plantillaNombre:{ type: String },
+    tipoDispositivoID:{ type: String, required: [true] },
+    tipoDispositivoNombre:{ type: String, required: [true] },
     fechaCreacion: {type: Number}
 })
 

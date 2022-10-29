@@ -111,8 +111,8 @@
                         //Nos desubcribimos del topic antiguo
                         this.$nuxt.$off(this.topic + "/sdata");
                         //Nos subcribimos la nuevo
-                        this.topic = this.config.userId + '/' + this.config.selectedDevice.dId + '/' + this.config.variable;
-                        this.$nuxt.$on(this.topic + "/sdata", this.procesReceivedData);
+                        this.topic = this.config.userId + '/' + this.config.dispositivoSeleccionado.dId + '/' + this.config.variable;
+                        this.$nuxt.$on(this.topic + "/sdata", this.procesadoDatosRecibidos);
                         //Recinciamos los datos de la tabal
                         this.chartOptions.series[0].data = [];
                         //Conseguimos los datos de nuevo dle servidor

@@ -7,13 +7,14 @@
         <i class="fa " :class="[config.icono, getIconColorClass() ]" style="font-size: 30px "></i>
 
         <div class="row pull-right">
-            <base-button @click="enviarValor()" type="primary" class="mb-3" size="lg">Cambiar</base-button>
+            <base-button @click="enviarValor()" type="primary" class="mb-3" size="lg">{{this.config.text}}</base-button>
         </div>
 
     </card>
 </template>
 
 <script>
+
 
 export default {
     props: ['config'],
@@ -43,6 +44,8 @@ export default {
     mounted(){
         //this.$nuxt.$on('widget-tipic', this.procesadoDatosRecibidos)
         const topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/actdata";
+        console.log("Hola IOTBOTON");
+        console.log(this.config);
         
         this.$nuxt.$on(topic,this.procesadoDatosRecibidos);
     },
@@ -64,10 +67,10 @@ export default {
             //truco para la maquetacion - Modificar para comprobar el estado real.
             setTimeout(() => {
                 this.enviado=false;
-            }, 1000)
+            }, 2000)
 
             const toSend ={
-                topic: this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/actdata",
+                topic: this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable.nombre + "/actdata",
                 msg: {
                     value: this.config.message
                 }

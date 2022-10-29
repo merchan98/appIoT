@@ -108,10 +108,11 @@ router.post("/getMqttcredenciales", checkAuth, async (req, res) => {
     try {
         //Constantes y variables
         const userID = req.datosUsuarios._id;
+        
 
         //llamaos a la funcion para consegui rlos credenciales
         const credenciales = await getMqttCredencialesWeb(userID);
-
+        console.log(credenciales);
         //Creamos la respuesta
         const toSend = {
             status: "success",
@@ -119,7 +120,7 @@ router.post("/getMqttcredenciales", checkAuth, async (req, res) => {
             password: credenciales.mqttPassword
         }
         res.json(toSend);
-
+        
         //Cambiamos el usuario y la contraseña para que solo se pueda acceder  durante un tiempo limitado
         setTimeout(()=>{
             getMqttCredencialesWeb(userID);
@@ -196,7 +197,7 @@ router.post("/getMqttcredencialesReconexion", checkAuth, async (req, res) => {
 async function getMqttCredencialesWeb(userID){
     try {
         var regla = await ReglaEmqxAuth.find({tipo: "usuario", userID: userID});
-
+        console.log("Hola desde Get Credencilaes WEB"+ regla);
         //Es la primera vez
         if(regla.length == 0){
             //Construimos al regal a crear
@@ -227,9 +228,9 @@ async function getMqttCredencialesWeb(userID){
             const nuevoPassword = realizarID(10);
 
             //Actualizamos el usuario y la contraseña
-            const respuesta = await ReglaEmqxAuth.updateOne({tipo:"user", userID: userID}, {$set: {username: nuevoUsername, password: nuevoPassword, updatedTime: Date.now()}});
-    
-            if(respuesta.n ==1 && respuesta == 1){ //Si se ha encontrado el registro y se a modificado correctamente
+            const respuesta = await ReglaEmqxAuth.updateOne({tipo:"usuario", userID: userID}, {$set: {username: nuevoUsername, password: nuevoPassword, updatedTime: Date.now()}});
+            console.log(respuesta);
+            if(respuesta.modifiedCount ==1 && respuesta.matchedCount == 1){ //Si se ha encontrado el registro y se a modificado correctamente
                 return{
                     mqttUsername: nuevoUsername,
                     mqttPassword: nuevoPassword

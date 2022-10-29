@@ -3,6 +3,7 @@ export const state = () => ({
     dispositivos: [],
     auth: null,
     dispositivoSeleccionado: {},
+    plantillas:[],
     notificaciones: []
 })
 
@@ -19,6 +20,9 @@ export const mutations = {
     },
     setNotificaciones(state, notificaciones){
         state.notificaciones= notificaciones;
+    },
+    setPlantillas(state, plantillas){
+        state.plantillas= plantillas;
     }
 }
 
@@ -84,7 +88,29 @@ export const actions = {
             .catch(error => {
                 console.log(error);
             })
+    },
+    getPlantillas(){
+        //Cabecera para la llamada
+        const headerAxios = {
+            headers: {
+                token: this.state.auth.token
+            }
+        }
+
+        //LLamada a ala api de notificaciones
+        this.$axios.get("/plantilla", headerAxios)
+            .then(res => {
+                //Prueba
+                console.log("Salida GET Plantillas desde store");
+                console.log(res.data.data);
+                //Actualizar notificaiones con el resultado
+                this.commit("setPlantillas", res.data.data)
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
+    
 }
 
 

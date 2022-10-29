@@ -87,7 +87,7 @@ router.delete("/plantilla", checkAuth, async(req,res) =>{
                 status: "fail",
                 error: "Plantilla en uso"
             }
-            return res.json(response);
+            return res.json(toSend);
         }
 
         

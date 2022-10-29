@@ -33,7 +33,50 @@
                         <base-input v-model="ncConfig.variableNombreCompleto" label="Var Name" type="text"></base-input>
                         <base-input v-model="ncConfig.unidad" label="Unidad" type="text"></base-input>
                         <base-input v-model="ncConfig.icono" label="Icono" type="text"></base-input>
-                        <base-input v-model="ncConfig.tablaTiempo" label="Perido de tiempo" type="number"></base-input>
+                        
+                        <label>Clase icono</label>
+                        <el-select v-model="ncConfig.class" class="select-success" label="Clase icono" placeholder="Selecciona una Clase" style="width: 100%;" >
+                            <el-option class="text-success" value="success" label="Success"></el-option>
+                            <el-option class="text-primary" value="primary" label="Primary"></el-option> 
+                            <el-option class="text-warning" value="warning" label="Warning"></el-option>
+                            <el-option class="text-danger"  value="danger"  label="Danger"></el-option>
+                        </el-select>
+
+                        <br/><br/>
+                        
+                        <label>Tamaño columna</label>
+                        <el-select v-model="ncConfig.column" class="select-success" label="Tamaño Columna" placeholder="Selecciona el tam colum" style="width: 100%;"> 
+                            <el-option class="text-dark" value="col-3" label="col-3" ></el-option>
+                            <el-option class="text-dark" value="col-4" label="col-4" ></el-option>
+                            <el-option class="text-dark" value="col-5" label="col-5" ></el-option>
+                            <el-option class="text-dark" value="col-6" label="col-6" ></el-option>
+                            <el-option class="text-dark" value="col-7" label="col-7" ></el-option>
+                            <el-option class="text-dark" value="col-8" label="col-8" ></el-option>
+                            <el-option class="text-dark" value="col-9" label="col-9" ></el-option>
+                            <el-option class="text-dark" value="col-10" label="col-10" ></el-option>
+                            <el-option class="text-dark" value="col-11" label="col-11" ></el-option>
+                            <el-option class="text-dark" value="col-12" label="col-12" ></el-option>
+                        </el-select>
+                        
+
+                        <br/><br/>
+
+                        <label>Dispostivo</label>
+                        <base-input>
+                            <el-select v-model="ncConfig.dispositivo" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(dispositivo, index) in $store.state.dispositivos" class="text-dark" :value="dispositivo" :key="dispositivo._id"  :label="dispositivo.nombre"></el-option>
+                            </el-select>
+                        </base-input>
+
+
+                        <label v-if="ncConfig.dispositivo  !=  null">Variable</label>
+                        <!-- {{ $store.state.dispositivos[ncConfig.dispositivo].tipoDispositivo.variables}} -->
+                        <base-input v-if="ncConfig.dispositivo  !=  null">
+                            <el-select v-model="ncConfig.variable" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(widget, index) in ncConfig.dispositivo.tipoDispositivo.variables " class="text-dark" :value="widget" :key="widget._id"  :label="widget.nombre"></el-option>
+                            </el-select>
+                        </base-input>
+
                     </div>
 
                     <!-- Formularios tipo switch-->
@@ -67,6 +110,22 @@
                         
 
                         <br/>
+                        <br/>
+
+                        <label>Dispostivo</label>
+                        <base-input>
+                            <el-select v-model="configSwitch.dispositivo" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(dispositivo, index) in $store.state.dispositivos" class="text-dark" :value="dispositivo" :key="dispositivo._id"  :label="dispositivo.nombre"></el-option>
+                            </el-select>
+                        </base-input>
+
+                        <label v-if="configSwitch.dispositivo  !=  null">Variable</label>
+                        <!-- {{ $store.state.dispositivos[configSwitch.dispositivo].tipoDispositivo.variables}} -->
+                        <base-input v-if="configSwitch.dispositivo  !=  null">
+                            <el-select v-model="configSwitch.variable" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(widget, index) in configSwitch.dispositivo.tipoDispositivo.variables " class="text-dark" :value="widget" :key="widget._id"  :label="widget.nombre"></el-option>
+                            </el-select>
+                        </base-input>
                     </div>
 
                     
@@ -104,7 +163,22 @@
                             <el-option class="text-dark" value="col-12" label="col-12" ></el-option>
                         </el-select>
 
-                        <br/>
+                        <br/><br/>
+
+                        <label>Dispostivo</label>
+                        <base-input>
+                            <el-select v-model="configBoton2.dispositivo" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(dispositivo, index) in $store.state.dispositivos" class="text-dark" :value="dispositivo" :key="dispositivo._id"  :label="dispositivo.nombre"></el-option>
+                            </el-select>
+                        </base-input>
+
+                        <label v-if="configBoton2.dispositivo  !=  null">Variable</label>
+                        <!-- {{ $store.state.dispositivos[configBoton2.dispositivo].tipoDispositivo.variables}} -->
+                        <base-input v-if="configBoton2.dispositivo  !=  null">
+                            <el-select v-model="configBoton2.variable" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(widget, index) in configBoton2.dispositivo.tipoDispositivo.variables " class="text-dark" :value="widget" :key="widget._id"  :label="widget.nombre"></el-option>
+                            </el-select>
+                        </base-input>
 
                     </div>
 
@@ -138,6 +212,23 @@
                         </el-select>
 
                         <br/>
+
+                        <br/>
+
+                        <label>Dispostivo</label>
+                        <base-input>
+                            <el-select v-model="configIndicador.dispositivo" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(dispositivo, index) in $store.state.dispositivos" class="text-dark" :value="dispositivo" :key="dispositivo._id"  :label="dispositivo.nombre"></el-option>
+                            </el-select>
+                        </base-input>
+
+                        <label v-if="configIndicador.dispositivo  !=  null">Variable</label>
+                        <!-- {{ $store.state.dispositivos[configIndicador.dispositivo].tipoDispositivo.variables}} -->
+                        <base-input v-if="configIndicador.dispositivo  !=  null">
+                            <el-select v-model="configIndicador.variable" label="TipoDispostivos" placeholder="Selecciona el dispostivo" class="select-primary">
+                                <el-option v-for="(widget, index) in configIndicador.dispositivo.tipoDispositivo.variables " class="text-dark" :value="widget" :key="widget._id"  :label="widget.nombre"></el-option>
+                            </el-select>
+                        </base-input>
                     </div>
 
 
@@ -261,6 +352,8 @@ export default{
         return {
             widgets: [],
             plantillas: [],
+            tiposDipositvos: [],
+            dispositivos: [],
             widgetTipo: "",
             plantillaNombre: "",
             plantillaDescripcion: "",
@@ -272,7 +365,7 @@ export default{
                     dID: "49894"
                 },
                 variableNombreCompleto: "temperatura",
-                variable: "varname",
+                variable: "NombreDeVariable",
                 unidad: "Watios",
                 class: "success",
                 column: "col-12",
@@ -290,7 +383,7 @@ export default{
                 },
                 variableNombreCompleto: "Pump",
                 text: "send",
-                variable: "varname",
+                variable: "NombreDeVariable",
                 icono: "fa-sun",
                 column: 'col-6',
                 widget: "boton",
@@ -316,7 +409,7 @@ export default{
                     dID: "9798"
                 },
                 variableNombreCompleto: "Bombilla",
-                    variable: "varname",
+                    variable: "NombreDeVariable",
                     class: "danger",
                     widget: "switch",
                     icono: "fa-bath",
@@ -366,23 +459,24 @@ export default{
         },
         mounted(){
             this.getPlantillas();
+            this.$store.dispatch("getPlantillas");
         },
         methods: {
-            addNewWidget(){
+            addNewWidget(){ //Quito los reailzar ID por que ya estan identificados por las variables
                 if(this.widgetTipo == "indicador"){
-                    this.configIndicador.variable = this.realizarID(13);
+                    // this.configIndicador.variable = this.realizarID(13);
                     this.widgets.push(JSON.parse(JSON.stringify(this.configIndicador)));
                 }
                 if(this.widgetTipo == "boton"){
-                    this.configBoton2.variable = this.realizarID(13);
+                    // this.configBoton2.variable = this.realizarID(13);
                     this.widgets.push(JSON.parse(JSON.stringify(this.configBoton2)));
                 }
                 if(this.widgetTipo == "switch"){
-                    this.configSwitch.variable = this.realizarID(13);
+                    // this.configSwitch.variable = this.realizarID(13);
                     this.widgets.push(JSON.parse(JSON.stringify(this.configSwitch)));
                 }
                 if(this.widgetTipo == "graficoNum"){
-                    this.ncConfig.variable = this.realizarID(13);
+                    // this.ncConfig.variable = this.realizarID(13);
                     this.widgets.push(JSON.parse(JSON.stringify(this.ncConfig)));
                 }
             },
@@ -417,7 +511,7 @@ export default{
                 }
 
                 
-                try {
+                try { // Try-catch 2
                     //Llamamos a la API
                     const res =await this.$axios.post("/plantilla", toSend, headerAxios)
                     if(res.data.status == "success"){
@@ -450,9 +544,9 @@ export default{
                         token: this.$store.state.auth.token
                     }
                 };
-                console.log("Hola desd eget plantillas");
+                // console.log("Hola desd eget plantillas");
                 console.log(headerAxios);
-                try {
+                try { // Try-catch 3
                     //Llamamos a la API
                     const respuestaPlantillas =await this.$axios.get("/plantilla", headerAxios);
                     
@@ -485,17 +579,18 @@ export default{
                 };
                 console.log(headerAxios);
                 
-                try {
+                try {// Try-catch 4
                     //Llamamos a la API
                     const respuestaBorrado =await this.$axios.delete("/plantilla", headerAxios);
 
                     //Por si laplantilla tiene dispostivos 
-                    if(respuestaBorrado.data.status == "fail" && res.data.error== "Plantilla en uso"){
+                    if(respuestaBorrado.data.status == "fail" && respuestaBorrado.data.error== "Plantilla en uso"){
                         //notificamos que todo ha ido mail
+                        console.log(plantilla);
                         this.$notify({
                             type: "danger",
                             icon: "tim-icons icon-alert-circle-exc",
-                            message: plantilla.nombre +"esta en uso. Borra primero los dispositvios vincualdo con ella."
+                            message: plantilla.plantillaNombre +" esta en uso. Borra primero los dispositvios vincualdo con ella."
                         })
                     }
 

@@ -69,7 +69,7 @@ export default {
     methods: {
 
         procesadoDatosRecibidos(data){
-            try {
+            try { // Try-catch 5
                 console.log("Recibido IoTIndicator");
                 console.log(data);
                 this.value = data.value;

@@ -107,6 +107,7 @@
   import ContentFooter from '@/components/Layout/ContentFooter.vue';
   import DashboardContent from '@/components/Layout/Content.vue';
   import { SlideYDownTransition, ZoomCenterTransition } from 'vue2-transitions';
+  import mqtt from 'mqtt';
 
   export default {
     components: {
@@ -119,7 +120,21 @@
     },
     data() {
       return {
-        sidebarBackground: 'vue' //vue|blue|orange|green|red|primary
+        sidebarBackground: 'vue', //vue|blue|orange|green|red|primary
+        client: null,
+        options: { //Opciones de mqtt
+          port: 8083,
+          host: 'localhost',
+          endpoint: '/mqtt',
+          clean: true,
+          connectTimeout: 5000,
+          reconnectPeriod: 5000,
+
+          clientId: 'web' + this.$store.state.auth.datosUsuarios.nombre + "_" + Math.floor(Math.random()*(1-10000) * -1),
+          username: 'superuser',
+          password: 'superuser',
+        },
+        
       };
     },
     computed: {
@@ -146,10 +161,188 @@
         } else {
           docClasses.add('perfect-scrollbar-off');
         }
+      },
+      async getMqttCredenciales(){
+        try {
+          //Cabecera de AXIOS
+          const headerAxios ={
+            headers:{
+              token: this.$store.state.auth.token
+            }
+          }
+          console.log("LLEGO A GET CREDENCIALES");
+          //LLAmada a xios para llamar a la API
+          const credenciales = await this.$axios.post("/getMqttcredenciales", null, headerAxios);
+  
+          //Grabamos las credeciales en opcion del data
+          if(credenciales.data.status == "success"){
+            this.options.username = credenciales.data.username;
+            this.options.password = credenciales.data.password;
+          }else{
+            console.log("Las credenciales no se han grabado correctamente");
+          }
+        } catch (error) {
+          console.log(error);
+          if(error.response.status ==401){
+            console.log("El token no es valido");
+            localStorage.clear();
+            window.location.href ="/login";
+          }
+        }
+      },
+      async getMqttCredencialesReconnect(){
+        try {
+          //Cabecera de AXIOS
+          const headerAxios ={
+            headers:{
+              token: this.$store.state.auth.token
+            }
+          }
+          //LLAmada a xios para llamar a la API
+          const credenciales = await this.$axios.post("/getMqttcredencialesReconexion", null, headerAxios);
+          console.log("Data de las credenciales");
+          console.log(credenciales.data);
+  
+          //Grabamos las credeciales en opcion del data
+          if(credenciales.data.status == "success"){
+            this.client.options.username = 'superuser'//credenciales.data.username;
+            this.client.options.password = 'superuser'//credenciales.data.password;
+          }else{
+            console.log("Las credenciales no se han grabado correctamente");
+          }
+        } catch (error) {
+          console.log(error);
+          //Por si se ha vencido el token
+          if(error.response.status ==401){
+            console.log("El otken no es valido");
+            localStorage.clear();
+            window.location.href ="/login";
+          }
+        }
+      },
+      async startMqttClient(){
+        //Constantes y variables
+
+        //Conseguimos las credenciales
+        await this.getMqttCredenciales();
+        
+        //Contrucion de los tipicos
+        const topicDispositivo =  this.$store.state.auth.datosUsuarios._id + '/+/+/sdata';
+        const topicNotificaciones =  this.$store.state.auth.datosUsuarios._id + "/+/+/notif";
+        //Url de construccion
+        const urlconnect = "ws://" + this.options.host + ":" + this.options.port + this.options.endpoint;
+        
+
+        //Conexion del cliente
+        try {
+          this.client = mqtt.connect(urlconnect, this.options);
+          
+        } catch (error) {
+          console.log("Error en el cliente MQTT del front");
+          console.log(error);
+        }
+        
+
+
+        //Hooks o ganchos
+        this.client.on('connect', () => {
+          console.log("MQTT CONEXION -> SUCCESSS; \n");
+  
+          //Nos subcribimos al topic del dispositivo
+          
+          
+          this.client.subscribe(topicDispositivo, { qos:0 }, (error) =>{
+            if(error){
+              console.log("Error al subcibirse al topic del Dispositivo");
+              console.log(error);
+              return;
+            }
+            // this.client.publish(topicDispositivo,'hello');
+            console.log("Conexion correcta con el topic del Dispositivo");
+            console.log(topicDispositivo);
+            return 0;
+          });
+          
+          
+          //Nos subcribimos al topic del notificaciones
+          this.client.subscribe(topicNotificaciones, {qos:0}, (error)=>{
+            if(error){
+              console.log("Error al subcibirse al topic del Notificaciones");
+              console.log(error);
+              return;
+            }
+            console.log("Conexion correcta con el topic del Notificaciones");
+            console.log(topicNotificaciones);
+          })
+          // console.log(this.client);
+        });
+
+        //Reconexion
+        this.client.on('reconnect', error => {
+          console.log("RECONECTANDO \n");
+          console.log(error);
+  
+          this.getMqttCredencialesReconnect();
+        });
+        //Error
+        this.client.on('error', error => {
+          console.log("MQTT CONEXION -> FAIL; \n");
+          console.log(error);
+        });
+
+        this.client.on("disconnect", error => {
+          console.log("MQTT disconnect EVENT FIRED:", error);
+        });
+
+        console.log(this.client);
+        //Recibimos un mensaje
+        this.client.on('message',(topic, message) =>{
+          console.log("Menseje desde el topic"+ topic+" => ");
+          console.log(message.toString()); 
+  
+          try {
+            //Dividimos el topic
+            const splitTopic= topic.split("/");
+            const tipoMensaje= splitTopic[3];
+  
+            if(tipoMensaje == "notif"){
+              this.$notify({
+                type: 'danger',
+                icon: 'tim-icons icon-alert-circle-exec',
+                message: message.toString()
+              })
+              //para recibir las notificaciones
+              this.$store.dispatch("getNotificaciones");
+              return;
+            }else if (tipoMensaje == "sdata"){
+              //pasamos el mesnaje a los dispositivos atrves de mensajeria de nuxt
+              $nuxt.$emit(topic, JSON.parse(message.toString()));
+              return;
+            }
+          } catch (error) {
+            console.log("Error en al manejar el mensaje recibido de mqtt");
+            console.log(error);
+          }
+        });
+  
+        $nuxt.$on('mqtt-sender', (toSend) => {
+          //
+          this.client.publish(toSend.topic, JSON.stringify(toSend.msg));
+        });
+  
       }
     },
+    beforeDestroy() {
+    this.$nuxt.$off("mqtt-sender");
+    },
     mounted() {
-      this.initScrollbar();
+      this.initScrollbar(); 
+      //para recibir las notificaciones
+      this.$store.dispatch("getNotificaciones");
+      //Iniciamos el cliente MQTT
+      setTimeout(() =>{
+        this.startMqttClient();
+      }, 2000)
     }
   };
 </script>
@@ -183,3 +376,4 @@
     animation-name: zoomOut95;
   }
 </style>
+

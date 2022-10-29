@@ -8,7 +8,7 @@ import DatosDispositivo from '../modelos/dataDispositvos';
 
 
 //Conseguir datos para la tabla
-router.get("//get-small-charts-data", checkAuth, async (req,res) =>{
+router.get("/get-small-charts-data", checkAuth, async (req,res) =>{
     try {
         
         //Constantes y variables

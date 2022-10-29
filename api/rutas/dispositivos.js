@@ -17,8 +17,8 @@ import Dispositivo from '../modelos/dispositivo.js';
 import ReglaGuardado from "../modelos/emqxReglaGuardado";
 import ReglaAlarma from '../modelos/emqxReglasAlarmas.js';
 import Plantilla from '../modelos/plantilla.js';
-import ReglaEmqxAuth from '../modelos/emqxAuth.js';
-import { RuntimeGlobals } from 'webpack';
+import TipoDispositivo from '../modelos/tiposDispositvos.js';
+
 
     
 /*
@@ -61,18 +61,22 @@ router.get("/dispositivo", checkAuth, async (req, res) => {
         //busqueda de Alarmas
         const alarmas = await getAlarmas(userID);
 
+        //busqueda tipo de Dispositvo
+        const tipodDispositivos = await getTiposDispositvos();
+
         //Cruce de tablas para añadir las reglas de guardado al dispositvo
         dispositivosArray.forEach((dispositivo, index) =>{
             
             dispositivo.reglaGuardado = reglasGuardado.filter(reglaGuardado => reglaGuardado.dID == dispositivo.dID)[0];
-            console.log(dispositivo.reglaGuardado);
+            // console.log(dispositivo.reglaGuardado);
             dispositivo.plantilla = plantillas.filter(plantilla => plantilla._id == dispositivo.plantillaID)[0];
             dispositivo.alarmas = alarmas.filter(alarma => alarma.dID == dispositivo.dID);
+            dispositivo.tipoDispositivo = tipodDispositivos.filter(tipoDisp => tipoDisp._id == dispositivo.tipoDispositivoID)[0]
         })
         // console.log("LLEGO HASTA AQUI2");
         //Respuesta
         const toSend = {
-            status: "Success",
+            status: "success",
             data: dispositivosArray
         };
         res.json(toSend);
@@ -178,7 +182,7 @@ router.delete("/dispositivo", checkAuth , async (req, res) => {
 
         //Respuesta (Añadir info del dipostivo borrado en el futuro)
         const toSend = {
-            status: "Success",
+            status: "success",
             datos: resBorrado
         };
         return res.json(toSend);
@@ -204,7 +208,7 @@ router.put("/dispositivo", checkAuth , async  (req, res) => {
     
         if (await seleccionarDispositivo(userID, dispID)) {
             const toSend = {
-                status: "Success"
+                status: "success"
                 
             };
             
@@ -457,6 +461,18 @@ async function getAlarmas(userID){
         return false;
     }
 }
+
+//Funciones sobre Tipos de Dispostivos
+async function getTiposDispositvos(){
+    try {
+        const tipoDisp = await TipoDispositivo.find();
+        return tipoDisp;
+    } catch (error) {
+        console.log("Error al obtener los Tipo de dispostivos");
+        return false;
+    }
+}
+
 
 //Funciones de borrado
 

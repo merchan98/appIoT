@@ -64,7 +64,7 @@ router.post('/guardar-webhook', async(req, res) => {
 router.post('/alarma-webhook', async(req, res) => {
     try {
         //Por si no ha ahcertado el token de seguridad ((FALLA REVISAR)) 
-        console.log("HOLAAAA deade el webhoock");
+        // console.log("HOLAAAA deade el webhoock");
 
         if(req.headers.token != "121212"){
             //Respondemos con un 404 por seguridad
@@ -74,7 +74,7 @@ router.post('/alarma-webhook', async(req, res) => {
 
         //Para poder liberar la conexion con emqx
         res.sendStatus(200);
-        console.log("DESDE wl web despues de dar la trespuesta");
+        // console.log("DESDE wl web despues de dar la trespuesta");
         console.log(req.body);
         //Constantes y variables
         const alarmaEntrante = req.body;
@@ -84,7 +84,7 @@ router.post('/alarma-webhook', async(req, res) => {
 
         //Ultima notificacion
         const ultimaNotif= await Notificacion.find({dID: alarmaEntrante.dID, emqxReglaID: alarmaEntrante.emqxReglaID}).sort({time: -1}).limit(1);
-        console.log("HOLAAAA");
+        // console.log("HOLAAAA");
         if(ultimaNotif == 0){
             console.log("Primera Alarma");
             guardarNotificacionMongo(alarmaEntrante);
@@ -245,6 +245,18 @@ function startMqttClient(){
 
     client.on('connect', function() {
         console.log("MQTT CONEXION -> SUCCESS; \n".green);
+        let respu = client.subscribe('6307a7735554dfba876f7d01/as/as/sdata', { qos:0 }, error =>{
+            if(error){
+                console.log("Error al subcibirse al topic del Dispositivo");
+                console.log(error);
+                return;
+            }
+            // this.client.publish(topicDispositivo,'hello');
+            console.log("Conexion correcta con el topic del Dispositivo");
+            // console.log(topicDispositivo);
+            return 0;
+        });
+        // console.log(respu);
     });
     client.on('reconnect', error => {
         console.log("RECONECTANDO \n".green);

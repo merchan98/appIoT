@@ -12,11 +12,19 @@
                     <div class="form row">
                         <base-input v-model="nuevoDispositivo.nombre" label="Nombre de dispositvo" type="text" placeholder="Temperatura casa" class="col-4"></base-input>
                         <base-input v-model="nuevoDispositivo.dID" label="ID de dispositvo" type="text" placeholder="AS6255946"  class="col-4"></base-input>
-                        <div class="col-4">
+                        <!-- <div class="col-4">
                             <label> Plantillas </label>
                             <div class="row ">
-                                <el-select v-model="indexSeleccionadoPlantilla" label="Plantillas" placeholder="Selecciona la plantilla" class="select-primary">
+                                <el-select v-model="indexSeleccionadoTipoDispositivo" label="Plantillas" placeholder="Selecciona la plantilla" class="select-primary">
                                     <el-option v-for="(plantilla, index) in plantillas" class="text-dark" :value="index" :key="plantilla._id"  :label="plantilla.plantillaNombre"></el-option>
+                                </el-select>
+                            </div>
+                        </div> -->
+                        <div class="col-4">
+                            <label> Tipo Dispositivos </label>
+                            <div class="row ">
+                                <el-select v-model="indexSeleccionadoTipoDispositivo" label="TipoDispostivos" placeholder="Selecciona el tipo" class="select-primary">
+                                    <el-option v-for="(tipoDispostivo, index) in tipoDispositivos" class="text-dark" :value="index" :key="tipoDispostivo._id"  :label="tipoDispostivo.nombre"></el-option>
                                 </el-select>
                             </div>
                         </div>
@@ -42,7 +50,8 @@
                     </el-table-column>
                     <el-table-column prop="nombre" label="Nombre" style="background-color: transparent"></el-table-column>
                     <el-table-column prop ="dID" label="Id Dispositivo"></el-table-column>
-                    <el-table-column prop ="plantillaNombre" label="Plantilla"></el-table-column>
+                    <el-table-column prop ="tipoDispositivoNombre" label="Tipo Dispositivo"></el-table-column>
+                    <el-table-column prop ="tipoDispositivoID" label="Tipo Dispositivo ID"></el-table-column>
                     <el-table-column label="Acciones">
                         <!--Se ha modificado el base switch par que funcione correctamente-->
                         <div slot-scope="{row, $index }">
@@ -86,8 +95,9 @@ export default {
     },
     data(){
         return{
-            indexSeleccionadoPlantilla: null,
+            indexSeleccionadoTipoDispositivo: null,
             plantillas: [],
+            tipoDispositivos: [],
             nuevoDispositivo: {
                 nombre: "",
                 dID: "",
@@ -122,6 +132,7 @@ export default {
     mounted() {
         this.$store.dispatch("getDispositivos");
         this.getPlantillas();
+        this.getTipoDispositivo();
     },
     methods: {
         deleteDispositivo(dispositvo){
@@ -173,14 +184,14 @@ export default {
             };
             console.log(headerAxios);
             
-            try {
+            try { // Try-catch 1
                 //Llamamos a la API
                 const respuestaPlantillas =await this.$axios.get("/plantilla", headerAxios);
-                console.log(respuestaPlantillas.data.data[0]);
-                console.log(respuestaPlantillas.data.status);
+                // console.log(respuestaPlantillas.data.data[0]);
+                // console.log(respuestaPlantillas.data.status);
                 if(respuestaPlantillas.data.status == "success"){
                     this.plantillas = respuestaPlantillas.data.data;
-                    this.plantillas.push("hola");
+                    // this.plantillas.push("hola");
                 }
             } catch (error) {
                 console.log(error);
@@ -189,6 +200,35 @@ export default {
                     type: "danger",
                     icon: "tim-icons icon-alert-circle-exc",
                     message: "Ha ocurrido un error al obtener las plantillas."
+                });
+                return;
+            }
+        },
+        async getTipoDispositivo(){
+            //Contruimos el header para sarle a la api
+            const headerAxios = {
+                headers:{
+                    token: this.$store.state.auth.token
+                }
+            };
+            console.log(headerAxios);
+            
+            try { 
+                //Llamamos a la API
+                const respuestaTipos =await this.$axios.get("/tipodDispositivo", headerAxios);
+                console.log(respuestaTipos.data.data[0]);
+                console.log(respuestaTipos.data.status);
+                if(respuestaTipos.data.status == "success"){
+                    this.tipoDispositivos = respuestaTipos.data.data;
+                    //this.plantillas.push("hola");
+                }
+            } catch (error) {
+                console.log(error);
+                //notificamos el error
+                this.$notify({
+                    type: "danger",
+                    icon: "tim-icons icon-alert-circle-exc",
+                    message: "Ha ocurrido un error al obtener los tipos de dispositvos."
                 });
                 return;
             }
@@ -217,12 +257,12 @@ export default {
                 });
                 return;
             }
-            if(this.indexSeleccionadoPlantilla == null){
+            if(this.indexSeleccionadoTipoDispositivo == null){
                 //notificamos el error
                 this.$notify({
                     type: "warning",
                     icon: "tim-icons icon-alert-circle-exc",
-                    message: "Debes seleccionar una plantilla"
+                    message: "Debes seleccionar un tipo de Dispostivo"
                 });
                 return;
             }
@@ -236,14 +276,14 @@ export default {
             console.log(headerAxios);
 
             //Ponemos el nombre de la plantilla seleccionada en el dispositivo
-            this.nuevoDispositivo.plantillaID = this.plantillas[this.indexSeleccionadoPlantilla]._id;
-            this.nuevoDispositivo.plantillaNombre = this.plantillas[this.indexSeleccionadoPlantilla].plantillaNombre;
+            this.nuevoDispositivo.tipoDispositivoID = this.tipoDispositivos[this.indexSeleccionadoTipoDispositivo]._id;
+            this.nuevoDispositivo.tipoDispositivoNombre = this.tipoDispositivos[this.indexSeleccionadoTipoDispositivo].nombre;
 
             const toSend ={
                 nuevoDispositivo: this.nuevoDispositivo
             }
             //Realizamos la peticion a la API
-            console.log("ANtes de llamar a cracion en vue");
+            console.log("Astes de llamar a cracion en vue");
             console.log(this.nuevoDispositivo);
             this.$axios.post("/dispositivo", toSend, headerAxios)
                 .then(res =>{
@@ -251,7 +291,7 @@ export default {
                         //vaciamos el formulario
                         this.nuevoDispositivo.nombre="";
                         this.nuevoDispositivo.dID="";
-                        this.indexSeleccionadoPlantilla=null;
+                        this.indexSeleccionadoTipoDispositivo=null;
 
                         //Volvemos a rellenar la tabla
                         this.$store.dispatch("getDispositivos");
@@ -331,7 +371,7 @@ export default {
 };
 </script>
 
-<!-- Solucion al header blaco -->
+<!-- Solucion al header blanco -->
 <style>
 .el-table th.el-table__cell {
     background-color: transparent;
