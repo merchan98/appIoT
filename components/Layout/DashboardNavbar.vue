@@ -73,7 +73,7 @@
             <b style="color:red">{{ unixToDate(notificacion.fecha)}}</b>
               <div style="margin-left:50px">
                 <b>Dispositivo: </b> {{notificacion.DNombre}} <br>
-                <b>Variable: </b> {{notificacion.variableNombreCompleto}} <br>
+                <b>Variable: </b> {{notificacion.variable}} <br>
                 <b>Condicion: </b> {{notificacion.condicion}} <br>
                 <b>Limite: </b> {{notificacion.value}} <br>
                 <b>Valor: </b> {{notificacion.payload.value}}
@@ -233,7 +233,7 @@ export default {
       localStorage.clear()
       //Limpiamos nuestro store
       const authVacio= {};
-      this.$store.commit("setAuth", authvacio)
+      this.$store.commit("setAuth", authVacio)
       //Redirigimos al login
       window.location.href ="/login";
 

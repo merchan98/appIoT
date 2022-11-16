@@ -47,7 +47,7 @@ export default {
                     this.$nuxt.$off(this.topic);
 
                     //Nos subcrubumos el topic nuevo
-                    this.topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/sdata";
+                    this.topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable.nombre + "/sdata";
                     this.$nuxt.$on(this.topic,this.procesadoDatosRecibidos)
 
                 })
@@ -56,7 +56,7 @@ export default {
     },
     mounted(){
         //this.$nuxt.$on('widget-tipic', this.procesadoDatosRecibidos)
-        this.topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/sdata";
+        this.topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable.nombre + "/sdata";
         // console.log("Salida de IOTIndicador");
         // console.log(this.topic);
         this.$nuxt.$on(this.topic,this.procesadoDatosRecibidos)

@@ -12,8 +12,9 @@ import ReglaEmqxAuth from '../modelos/emqxAuth.js';
 
 //Autenticacion
 
+//Registro de un usuario
 router.post("/registro", async (req, res) => {
-    try {
+    try { // Try-catch 39
         const contraEncriptada = bcrypt.hashSync(req.body.password, 12);
 
         const nuevoUsuario = {
@@ -46,71 +47,80 @@ router.post("/registro", async (req, res) => {
 
 });
 
+//Logeo de un usuario
 router.post("/login", async (req, res) => {
     //console.log(req.body);
-    const contraEncriptada = bcrypt.hashSync(req.body.password, 12);
-
-    var usuario = await Usuario.findOne({ email: req.body.email });
-
-    //Si no existe el usuario
-    if (!usuario) {
-        const toSend = {
-            status: "ERROR",
-            error: "Credenciales Invalidas"
+    try { // Try-catch 40
+        const contraEncriptada = bcrypt.hashSync(req.body.password, 12);
+    
+        var usuario = await Usuario.findOne({ email: req.body.email });
+    
+        //Si no existe el usuario
+        if (!usuario) {
+            const toSend = {
+                status: "ERROR",
+                error: "Credenciales Invalidas"
+            }
+            return res.status(401).json(toSend);
         }
-        return res.status(401).json(toSend);
-    }
-
-    //Credenciales Validas
-    if (bcrypt.compareSync(req.body.password, usuario.password)) {
-        //Borramos al contraseña por se un dato sensible
-        usuario.set('password', undefined, { strict: false });
-        usuario.set('email', undefined, { strict: false });
-        //Genero el token JWT
-        const token = jwt.sign({ datosUsuario: usuario}, 'IoteESelmassegurodesdeel98', {expiresIn: 60*60*24*30});
-
-        const toSend = {
-            status: "success",
-            token: token,
-            datosUsuarios: usuario
-        };
-
-        return res.json(toSend);
-
-    } else { //Contraseña Erronea
-        const toSend = {
-            status: "ERROR",
-            error: "Credenciales Invalidas"
+    
+        //Credenciales Validas
+        if (bcrypt.compareSync(req.body.password, usuario.password)) {
+            //Borramos al contraseña por se un dato sensible
+            usuario.set('password', undefined, { strict: false });
+            usuario.set('email', undefined, { strict: false });
+            //Genero el token JWT
+            const token = jwt.sign({ datosUsuario: usuario}, 'IoteESelmassegurodesdeel98', {expiresIn: 60*60*24*30});
+    
+            const toSend = {
+                status: "success",
+                token: token,
+                datosUsuarios: usuario
+            };
+    
+            return res.json(toSend);
+    
+        } else { //Contraseña Erronea
+            const toSend = {
+                status: "ERROR",
+                error: "Credenciales Invalidas"
+            }
+            return res.status(401).json(toSend);
         }
-        return res.status(401).json(toSend);
-    }
-
-});
-
-//Manejo de usuarios
-router.get('/nuevoUsuario', async (req, res) => {
-    try {
-        const usuario = await Usuario.create({
-            nombre: "Jane",
-            email: "shjasp@jas.com",
-            password: "ho9las"
-        });
-        res.json({"status":"success"})
     } catch (error) {
-        console.log(error);
-        res.json({"status":"sucfailcess"})
+        const toSend = {
+            status: "Error en el Login",
+            error: error
+        }
+        return res.status(401).json(toSend);
     }
+
 });
+
+//Manejo de usuarios (CREACION DE PRUEBA)
+// router.get('/nuevoUsuario', async (req, res) => {
+//     try { // Try-catch 
+//         const usuario = await Usuario.create({
+//             nombre: "Jane",
+//             email: "shjasp@jas.com",
+//             password: "ho9las"
+//         });
+//         res.json({"status":"success"})
+//     } catch (error) {
+//         console.log(error);
+//         res.json({"status":"fail"})
+//     }
+// });
 
 
 //Get MQTT credenciales web
 router.post("/getMqttcredenciales", checkAuth, async (req, res) => {
-    try {
+    try { // Try-catch 41
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         
 
-        //llamaos a la funcion para consegui rlos credenciales
+        //llamamos a la funcion para consegui rlos credenciales
         const credenciales = await getMqttCredencialesWeb(userID);
         console.log(credenciales);
         //Creamos la respuesta
@@ -143,7 +153,7 @@ router.post("/getMqttcredenciales", checkAuth, async (req, res) => {
 
 //Get MQTT credenciales web para reconexiones
 router.post("/getMqttcredencialesReconexion", checkAuth, async (req, res) => {
-    try {
+    try { // Try-catch 42
         //Constantes y variables
         const userID = req.datosUsuarios._id;
 
@@ -193,9 +203,9 @@ router.post("/getMqttcredencialesReconexion", checkAuth, async (req, res) => {
 
 //Funciones
 
-//
+//Conseguir las credenciales para conectarse por MQTT
 async function getMqttCredencialesWeb(userID){
-    try {
+    try { // Try-catch 43
         var regla = await ReglaEmqxAuth.find({tipo: "usuario", userID: userID});
         console.log("Hola desde Get Credencilaes WEB"+ regla);
         //Es la primera vez
@@ -249,8 +259,7 @@ async function getMqttCredencialesWeb(userID){
 }
 
 async function getMqttCredencialesWebReconexion(userID){
-
-    try {
+    try { // Try-catch 44
         const respuesta = await ReglaEmqxAuth.findOne({tipo: "usuario", userID: userID});
 
         if(respuesta !== null){ //Si se ha encontrado el registro ç

@@ -43,7 +43,7 @@ export default {
     },
     mounted(){
         //this.$nuxt.$on('widget-tipic', this.procesadoDatosRecibidos)
-        const topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/actdata";
+        const topic = this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable.nombre + "/actdata";
         console.log("Hola IOTBOTON");
         console.log(this.config);
         
@@ -52,7 +52,7 @@ export default {
     beforeDestroy(){
         // Para que la subcion al topico se destruya ya que 
         // el mounted se ejecuta cada vez que visitas la pagina
-        this.$nuxt.$off(this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/actdata");
+        this.$nuxt.$off(this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable.nombre + "/actdata");
     },
     methods: {
 

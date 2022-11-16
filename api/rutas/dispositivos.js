@@ -15,7 +15,7 @@ const auth ={
 //Modelos
 import Dispositivo from '../modelos/dispositivo.js';
 import ReglaGuardado from "../modelos/emqxReglaGuardado";
-import ReglaAlarma from '../modelos/emqxReglasAlarmas.js';
+import ReglaAlarma from '../modelos/reglasAlarmas.js';
 import Plantilla from '../modelos/plantilla.js';
 import TipoDispositivo from '../modelos/tiposDispositvos.js';
 
@@ -40,7 +40,7 @@ import TipoDispositivo from '../modelos/tiposDispositvos.js';
 
 //peticion de dispostivos
 router.get("/dispositivo", checkAuth, async (req, res) => {
-    try {
+    try {// Try-catch 18
         // console.log(req);
         //Constantes y variables
         const userID = req.datosUsuarios._id;
@@ -95,7 +95,7 @@ router.get("/dispositivo", checkAuth, async (req, res) => {
 
 //Creacion del dispostivos
 router.post("/dispositivo", checkAuth , async (req, res) => {
-    try {
+    try {// Try-catch 19
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         var nuevoDispositvo = req.body.nuevoDispositivo;
@@ -137,8 +137,7 @@ router.post("/dispositivo", checkAuth , async (req, res) => {
 
 //Borrado del Dispositvo
 router.delete("/dispositivo", checkAuth , async (req, res) => {
-    
-    try {
+    try {// Try-catch 20
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         const dispID = req.query.dispID
@@ -201,7 +200,7 @@ router.delete("/dispositivo", checkAuth , async (req, res) => {
 
 //Seleccionamos el nuevo dispostivo
 router.put("/dispositivo", checkAuth , async  (req, res) => {
-    try {
+    try {// Try-catch 21
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         const dispID = req.body.dID;
@@ -228,7 +227,7 @@ router.put("/dispositivo", checkAuth , async  (req, res) => {
 
 //Update del status de la regla de guardado
 router.put("/reglaGuardado", checkAuth , async  (req, res) => {
-    try {
+    try {// Try-catch 22
         //Constantes y variables
         const regla = req.body.regla;
 
@@ -236,7 +235,7 @@ router.put("/reglaGuardado", checkAuth , async  (req, res) => {
 
         //Llamaos a la funcion para actualizr la regla
         var respuesta = await updateStatusReglaGuardado(regla.emqxReglaID, regla.status);
-
+        console.log(respuesta);
         //Respuesta
         if (respuesta != false) {
             const toSend = {
@@ -259,8 +258,10 @@ router.put("/reglaGuardado", checkAuth , async  (req, res) => {
 
 
 //Funciones
+
+//Selecciona un nuevo dispositvo
 async function seleccionarDispositivo(userIDrecib, dispIDrecib) {
-    try {
+    try {// Try-catch 23
         //Lo ponemos todo en falso
         const result = await Dispositivo.updateMany({ userID: userIDrecib }, { seleccionado: false })
 
@@ -276,8 +277,9 @@ async function seleccionarDispositivo(userIDrecib, dispIDrecib) {
     
 }
 
+//Selecciona un nuevo dispostivo al borrarlo
 async function seleccionarDispositivoBorrado(userIDrecib, dispIDrecib) {
-    try {
+    try {// Try-catch 24
         
         //Cojemos el dispositivo seleccionado
         const dispositivoRecibido = await Dispositivo.find({ userID: userIDrecib, dID: dispIDrecib });
@@ -290,10 +292,7 @@ async function seleccionarDispositivoBorrado(userIDrecib, dispIDrecib) {
                  //Ponemos 1 dispositivo en verdadero
                 const result2 = await Dispositivo.updateOne({ dID: dispositivo[0].dID, userID: userIDrecib }, { seleccionado: true });
             }
-            
         }
-        
-    
         return true;
     } catch (error) {
         console.log("Error en la funcion seleccionarDispositivoBorrado");
@@ -308,7 +307,7 @@ async function seleccionarDispositivoBorrado(userIDrecib, dispIDrecib) {
 
 //Peticion de reglas
 async function getReglasGuardado(userID){
-    try {
+    try { // Try-catch 25
         const reglas = await ReglaGuardado.find({userID: userID});
         return reglas;
     } catch (error) {
@@ -319,7 +318,7 @@ async function getReglasGuardado(userID){
 
 //Creación de Regla Guardados
 async function crearReglaGuardado(userID,dID,status){
-    try {
+    try { // Try-catch 26
         //Url de la api
         const url = "http://localhost:8085/api/v4/rules";
 
@@ -327,8 +326,8 @@ async function crearReglaGuardado(userID,dID,status){
         const topic= userID + "/" + dID + "/+/sdata";
 
         //Sentencia SQL
-        const rawsql= "SELECT topic, payload FROM \""+topic+"\" WHERE payload.save=1";
-    
+        const rawsql= 'SELECT topic, payload FROM "'+topic+'" WHERE payload.save=1';
+        console.log("Dentro de crear regla");
         //Objeto nueva regla
         var nuevaRegla = {
             rawsql: rawsql,
@@ -336,16 +335,16 @@ async function crearReglaGuardado(userID,dID,status){
                 name: "data_to_webserver",
                 params:{
                     $resource: global.recursoGuardado.id,
-                    payload_tmpl: '{"userID":"'+userID+'",payload":${payload},"topic":"${topic}"}'
+                    payload_tmpl: '{"userID":"'+userID+'","payload":${payload},"topic":"${topic}"}'
                 }
             }],
             description: "GUARDAR - REGLA",
             enabled: status
         };
-        
+        // console.log("antes de llamar ");
         //Llamada a la API para guardar la regla
         const respuesta =await axios.post(url, nuevaRegla, auth)
-
+        console.log(respuesta.data.data.id);
         if(respuesta.status === 200 && respuesta.data.data){
             //console.log(respuesta.data.data);
 
@@ -371,7 +370,7 @@ async function crearReglaGuardado(userID,dID,status){
 
 //Actualizar status de una regla
 async function updateStatusReglaGuardado(emqxReglaID, status){
-    try {
+    try { // Try-catch 27
         //Url de la api
         const url = "http://localhost:8085/api/v4/rules/"+emqxReglaID;
 
@@ -380,7 +379,7 @@ async function updateStatusReglaGuardado(emqxReglaID, status){
 
         //Llamada a la API de EMQX
         const respuesta = await axios.put(url, nuevaRegla, auth);
-        //console.log(respuesta);
+        console.log(respuesta);
         if(respuesta.status === 200 && respuesta.data.data){
             //Actualizamos la regal en la BD
             await  ReglaGuardado.updateOne({emqxReglaID: emqxReglaID},{status:status})
@@ -408,7 +407,7 @@ async function updateStatusReglaGuardado(emqxReglaID, status){
 
 //Borrar una regla 
 async function borrarReglaGuardado(dID){
-    try {
+    try { // Try-catch 28
         //Buscamos la regla por el ID del sipositivo pasado como parametro
         const regla = await ReglaGuardado.findOne({dID: dID});
 
@@ -440,7 +439,7 @@ async function borrarReglaGuardado(dID){
 
 //Peticion de plantillas
 async function getPlantillas(userID){
-    try {
+    try { // Try-catch 29
         const plantillas = await Plantilla.find({userID: userID});
         return plantillas;
     } catch (error) {
@@ -453,7 +452,7 @@ async function getPlantillas(userID){
 
 //Peticion de alarmas
 async function getAlarmas(userID){
-    try {
+    try { // Try-catch 30
         const alarmas = await ReglaAlarma.find({userID: userID});
         return alarmas;
     } catch (error) {
@@ -464,7 +463,7 @@ async function getAlarmas(userID){
 
 //Funciones sobre Tipos de Dispostivos
 async function getTiposDispositvos(){
-    try {
+    try { // Try-catch 31
         const tipoDisp = await TipoDispositivo.find();
         return tipoDisp;
     } catch (error) {
@@ -478,7 +477,7 @@ async function getTiposDispositvos(){
 
 //Borrado de Alarmas
 async function borrarAlarmas(userID, dispID){
-    try {
+    try { // Try-catch 32
         const reglas= await ReglaAlarma.find({ userID: userID, dID: dispID})
 
         //Si hay alarmas las enocntramos y borramos una a una toda en EMQX
@@ -501,7 +500,7 @@ async function borrarAlarmas(userID, dispID){
 
 //Borrado de credenciales MQTT
 async function borrarMqttCredenciales(dispID){
-    try {
+    try { // Try-catch 33
         //borramos todas las credenciales en mongo
         await ReglaAlarma.deleteMany({ dID: dispID, tipo: "dispositivo"});
 

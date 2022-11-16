@@ -58,7 +58,7 @@
 
             enviarValor(){
                 const toSend ={
-                    topic: this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable + "/actdata",
+                    topic: this.config.userId + "/" + this.config.dispositivoSeleccionado.dID + "/" + this.config.variable.nombre + "/actdata",
                     msg: {
                         svalue: this.value//this.config.message
                     }

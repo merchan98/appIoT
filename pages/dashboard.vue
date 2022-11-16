@@ -1,7 +1,9 @@
 <template>
     <div>
         <div class="row justify-content-between">
-            <div><h2> DashBoard</h2></div>
+            <div><h2> DashBoard</h2>
+                <h3 class="ml-2 mt-2 mb-1"> {{this.plantillaSeleccionada.plantillaNombre}}</h3>
+            </div>
         <br/>
             <div class="mr-2">
                 <el-select class="select-success pull-right mr-2" placeholder="Selecionar Plantilla" v-model="plantillaSeleccionada">
@@ -19,6 +21,7 @@
                 <IotIndicador v-if="widget.widget == 'indicador'" :config="completaWidgets(widget)"></IotIndicador>
                 <IoTGraficaNum v-if="widget.widget == 'graficoNum'" :config="completaWidgets(widget)"></IoTGraficaNum>
                 <IotSwitch v-if="widget.widget== 'switch'" :config="completaWidgets(widget)"></IotSwitch>
+                <!-- {{widget}} -->
             </div>
         </div>
         <!--FIN Previsualizador Dashboard -->
@@ -67,10 +70,12 @@
                 widgetCopia.userID = widgetCopia.dispositivo.userID;
 
                 console.log(widgetCopia.dispositivo.dID);
+                console.log(widget.widget);
                 if (widget.widget =="graficoNum"){
+                    console.log("HOLA ESTOY PONIENDO EL GRAFICO DEMO A FALASE");
                     widgetCopia.demo = false;
                 }
-                
+                console.log(widgetCopia.demo);
                 return widgetCopia;
             }
         }

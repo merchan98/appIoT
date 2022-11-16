@@ -39,7 +39,7 @@
         </sidebar-item>
         <sidebar-item
           :link="{
-            name: 'Templates',
+            name: 'Plantillas',
             icon: 'tim-icons icon-atom',
             path: '/templates'
           }"

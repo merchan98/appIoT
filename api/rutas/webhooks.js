@@ -10,15 +10,14 @@ import { checkAuth } from "../middlewares/autenfificadortoken";
 //imports
 import DatosDispositivo from "../modelos/dataDispositvos";
 import Dispositivo from "../modelos/dispositivo";
-import ReglaAlarma from "../modelos/emqxReglasAlarmas";
+import ReglaAlarma from "../modelos/reglasAlarmas";
 import Notificacion from "../modelos/notificacion";
 
 
 //Guardar datos
 router.post('/guardar-webhook', async(req, res) => {
-    try {
+    try { // Try-catch 45
         //Por si no ha ahcertado el token de seguridad
-        console.log(req.headers);
         if(req.headers.token != "121212"){
             //Respondemos con un 404 por seguridad
             res.sendStatus(404);
@@ -27,12 +26,13 @@ router.post('/guardar-webhook', async(req, res) => {
         
         //Obtencion de datos
         const data = req.body;
-        const splitTopic = data.topìc.split("/");
+        console.log(data.topic.split("/"));
+        const splitTopic = data.topic.split("/");
         const dID = splitTopic[1];
         const variable = splitTopic[2];
         
         var resultadoBusqueda = await Dispositivo.find({dID: dID, userID: data.userID})
-
+        console.log("YA esta guardado");
         //Creacion del dato
         if(resultadoBusqueda.length == 1){
             DatosDispositivo.create({
@@ -62,10 +62,9 @@ router.post('/guardar-webhook', async(req, res) => {
 
 //Alarmas
 router.post('/alarma-webhook', async(req, res) => {
-    try {
+    try { // Try-catch 46
         //Por si no ha ahcertado el token de seguridad ((FALLA REVISAR)) 
         // console.log("HOLAAAA deade el webhoock");
-
         if(req.headers.token != "121212"){
             //Respondemos con un 404 por seguridad
             res.sendStatus(404);
@@ -78,6 +77,8 @@ router.post('/alarma-webhook', async(req, res) => {
         console.log(req.body);
         //Constantes y variables
         const alarmaEntrante = req.body;
+        console.log("Alarma entrante");
+        console.log(alarmaEntrante);
 
         //Actualizamos el contador de alarma
         actualizarAlarmaContador(alarmaEntrante.emqxReglaID);
@@ -94,7 +95,7 @@ router.post('/alarma-webhook', async(req, res) => {
             //Saber si a superado el umbral para volver a grabar la notificacion
             const ultimaNotifActualMinutos =(Date.now() - ultimaNotif[0].fecha) /1000 /60;
             
-            if(ultimaNotifActualMinutos >alarmaEntrante.triggerTime){
+            if(ultimaNotifActualMinutos > alarmaEntrante.triggerTime){
                 console.log("Umbral superado");
                 guardarNotificacionMongo(alarmaEntrante);
                 enviarMqttNotif(alarmaEntrante);
@@ -114,7 +115,7 @@ router.post('/alarma-webhook', async(req, res) => {
 
 //Obtener Las notificaciones
 router.get("/notificaciones", checkAuth, async(req, res) => {
-    try {
+    try { // Try-catch 47
         //Contstes y variables
         
         const userID=req.datosUsuarios._id;
@@ -145,7 +146,7 @@ router.get("/notificaciones", checkAuth, async(req, res) => {
 
 //Actualizar el estado de las notificaciones
 router.put("/notificaciones", checkAuth, async(req, res) => {
-    try {
+    try { // Try-catch 48
         //Contstes y variables
         const userID=req.datosUsuarios._id;
         const notificacionID = req.body.notificacionID;
@@ -179,9 +180,9 @@ router.put("/notificaciones", checkAuth, async(req, res) => {
 
 /* FUNCIONES */
 
-//Guardar al notidicacion el mongo
+//Guardar al notificacion el mongo
 function guardarNotificacionMongo(alarmaEntrante){
-    try {
+    try { // Try-catch 49
         console.log("Guardar Notificacion");
         console.log(alarmaEntrante);
         var nuevaNotificaicon = alarmaEntrante;
@@ -189,14 +190,14 @@ function guardarNotificacionMongo(alarmaEntrante){
         nuevaNotificaicon.leido = false;
         Notificacion.create(nuevaNotificaicon);
     } catch (error) {
-        console.log("Error al guardar al notificacion");
+        console.log("Error al guardar al notificacion"); 
         console.log(error);
     }
 }
 
 //Actualizar el contador de notficaciones
 async function actualizarAlarmaContador(emqxReglaID){
-    try {
+    try { // Try-catch 50
         //Llamada a mongo
         await ReglaAlarma.updateOne({emqxReglaID: emqxReglaID},{$inc:{counter:1}})
     } catch (error) {
@@ -207,7 +208,7 @@ async function actualizarAlarmaContador(emqxReglaID){
 
 //Conseguir todas las notificaiones no leidas
 async function getNotficaciones(userID){
-    try{
+    try{ // Try-catch 51
         //LLamada a mongo para ocnseguir todas las notificaciones del usuario con el leido a false
         const respuesta = await Notificacion.find({userID: userID, leido: false});
         return respuesta;
@@ -245,17 +246,17 @@ function startMqttClient(){
 
     client.on('connect', function() {
         console.log("MQTT CONEXION -> SUCCESS; \n".green);
-        let respu = client.subscribe('6307a7735554dfba876f7d01/as/as/sdata', { qos:0 }, error =>{
-            if(error){
-                console.log("Error al subcibirse al topic del Dispositivo");
-                console.log(error);
-                return;
-            }
-            // this.client.publish(topicDispositivo,'hello');
-            console.log("Conexion correcta con el topic del Dispositivo");
-            // console.log(topicDispositivo);
-            return 0;
-        });
+        // client.subscribe('6307a7735554dfba876f7d01/as/as/sdata', { qos:0 }, error =>{
+        //     if(error){
+        //         console.log("Error al subcibirse al topic del Dispositivo");
+        //         console.log(error);
+        //         return;
+        //     }
+        //     // this.client.publish(topicDispositivo,'hello');
+        //     console.log("Conexion correcta con el topic del Dispositivo");
+        //     // console.log(topicDispositivo);
+        //     return 0;
+        // });
         // console.log(respu);
     });
     client.on('reconnect', error => {
@@ -274,8 +275,9 @@ function startMqttClient(){
 
 //Enviar notificacion Mqtt
 function enviarMqttNotif(notif){
+    console.log("Envio notificacio");
     const topic = notif.userID + '/dummy-dID/dummy-var/notif';
-    const msg = 'La regla: cuando '+ notif.variableNombreCompleto + ' es ' + notif.condicion + ' que ' + notif.value;
+    const msg = 'La regla: cuando '+ notif.variable + ' es ' + notif.condicion + ' que ' + notif.value;
     client.publish(topic, msg);
 }
 

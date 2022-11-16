@@ -31,6 +31,7 @@
                 HoraActual: Date.now(),
                 estaMontado: false,
                 topic: "",
+                
                 opcionesGrafico:{
                     credits:{
                         enabled: false
@@ -111,17 +112,20 @@
                         //Nos desubcribimos del topic antiguo
                         this.$nuxt.$off(this.topic + "/sdata");
                         //Nos subcribimos la nuevo
-                        this.topic = this.config.userId + '/' + this.config.dispositivoSeleccionado.dId + '/' + this.config.variable;
+                        this.topic = this.config.userID + '/' + this.config.dispositivoSeleccionado.dID + '/' + this.config.variable.nombre;
                         this.$nuxt.$on(this.topic + "/sdata", this.procesadoDatosRecibidos);
                         //Recinciamos los datos de la tabal
-                        this.chartOptions.series[0].data = [];
+                        this.opcionesGrafico.series[0].data = [];
+                        //console.log(this.opcionesGrafico.series[0].data);
                         //Conseguimos los datos de nuevo dle servidor
                         this.getChartData();
+                        console.log("Ya he llamado a get char data en el watch");
+                        console.log(this.topic);
 
                         this.opcionesGrafico.series[0].name =this.config.variableNombreCompleto +" "+ this.config.unidad;
                         this.updateClassColor();
                         window.dispatchEvent(new Event('resize'));
-                    }, 1000);
+                    }, 300);
                 }
             }
         },
@@ -137,6 +141,16 @@
 
             updateClassColor(){
                 console.log("update"+ this.config.class);
+                console.log(this.topic);
+                //Primera recogida
+                this.topic = this.config.userID + '/' + this.config.dispositivoSeleccionado.dID + '/' + this.config.variable.nombre;
+                this.$nuxt.$on(this.topic + "/sdata", this.procesadoDatosRecibidos);
+                //Recinciamos los datos de la tabal
+                this.opcionesGrafico.series[0].data = [];
+                //console.log(this.opcionesGrafico.series[0].data);
+                //Conseguimos los datos de nuevo dle servidor
+                this.getChartData();
+
                 var c = this.config.class;
 
                 if(c=="success") {
@@ -152,39 +166,48 @@
                     this.opcionesGrafico.series[0].color = "#fd5d93";
                 }
                 this.opcionesGrafico.series[0].name = this.config.variableNombreCompleto +" "+ this.config.unidad;
+                console.log("Fin del update Lass color");
             },
 
             getChartData(){
                 if(this.config.demo){
                     this.opcionesGrafico.series[0].data = [[1606659071668, 22], [1606659072668, 27], [1606659073668, 32], [1606659074668, 7]];
                     this.estaMontado =true;
+                    console.log("ESTE GRAF ES DEMO");
                     return;
                 }
-
+                console.log("ESTE GRAF NOOOOO ES DEMO");
                 const axiosHeaders = {
                     headers: {
                         token: $nuxt.$store.state.auth.token, //CREO QUE ES UN ERROR
                     },
                     params: { 
                         dID: this.config.dispositivoSeleccionado.dID, 
-                        variable: this.config.variable,
+                        variable: this.config.variable.nombre,
                         tablaTiempo: this.config.tablaTiempo
                     }
                 }
                 this.$axios.get("/get-small-charts-data", axiosHeaders)
                     .then(res => {
+                        this.opcionesGrafico.series[0].data = [];
                         const data = res.data.data;
                         console.log("Salida IOTGraficaNum 1");
                         console.log(res.data);
-
+                        // console.log(this.opcionesGrafico.series[0].data);
+                        // let aux=[];
+                        // aux.push(data[0].time + (new Date().getTimezoneOffset()*60*1000*(-1)));
+                        // aux.push(data[0].value);
+                        // this.opcionesGrafico.series[0].data.push(aux);
                         data.forEach(elemento => {
-                            var aux=[];
+                            let aux=[];
                             aux.push(elemento.time + (new Date().getTimezoneOffset()*60*1000*(-1)));
                             aux.push(elemento.value);
                             this.opcionesGrafico.series[0].data.push(aux);
                         });
-
+                        console.log(this.opcionesGrafico.series[0].data);
                         this.estaMontado=true;
+                        // this.opcionesGrafico.series.push({name:'prueba',data:[], color: "#e166ca"})
+                        // this.opcionesGrafico.series[1].data = [[Date.now(), 22], [Date.now()+10056, 27], [Date.now()+14665, 32], [Date.now()+25000, 7]];
                         return;
                     })
                     .catch(error =>{
@@ -199,14 +222,19 @@
             },
 
             procesadoDatosRecibidos(data){
-                this.time = Date.now();
-                this.value = data.value;
-                //Para recargar si llegan nuevos datos (Retraso de 1 segundo por si acaso)
-                setTimeout(() =>{
-                    if(data.save == 1){
-                        this.getChartData();
-                    }
-                },1000)
+                try {
+                    this.time = Date.now();
+                    this.value = data.value;
+                    //Para recargar si llegan nuevos datos (Retraso de 1 segundo por si acaso)
+                    setTimeout(() =>{
+                        if(data.save == 1){
+                            this.getChartData();
+                        }
+                    },1000)
+                } catch (error) {
+                    console.log("Error en el procesado de datos Recibidos");
+                    console.log(error);
+                }
             },
 
             getTiempoActual(){

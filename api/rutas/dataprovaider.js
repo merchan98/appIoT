@@ -9,7 +9,7 @@ import DatosDispositivo from '../modelos/dataDispositvos';
 
 //Conseguir datos para la tabla
 router.get("/get-small-charts-data", checkAuth, async (req,res) =>{
-    try {
+    try {// Try-catch 17
         
         //Constantes y variables
         const userID = req.datosUsuarios._id;
@@ -19,7 +19,7 @@ router.get("/get-small-charts-data", checkAuth, async (req,res) =>{
 
         //Pasamos el tiempo de creacion de tabla a ms
         const tiempopasadoms = Date.now() - (tablaTiempo * 60 * 1000);
-        
+        console.log();
         //busqueda de dispostivos
         const datos = await DatosDispositivo.find({ userID: userID, dID: dID, variable: variable, "time": {$gt: tiempopasadoms} }).sort({"time": 1});
         console.log(datos);

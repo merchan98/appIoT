@@ -10,6 +10,25 @@ volumes:
 
 services:
 
+    node:
+        build: ../
+        volumes:
+            - ../:/home/app/
+        ports:
+            - "8081:8081"
+            - "3000:3000"
+            - "3001:3001"
+            - "80:3002"
+
+        command: npm run start
+
+        extra_hosts:
+            - "localhost:192.168.1.51"
+
+        links: 
+            - mongo
+            - emqx
+
     mongo:
         container_name: mongo
         image: mongo:4.4

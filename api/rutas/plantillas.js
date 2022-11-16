@@ -9,7 +9,7 @@ import Dispositivo from '../modelos/dispositivo.js';
 
 //Guardar Plantilla
 router.post("/plantilla", checkAuth, async (req,res) =>{
-    try {
+    try { // Try-catch 36
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         var nuevaPlantilla = req.body.plantilla;
@@ -22,7 +22,7 @@ router.post("/plantilla", checkAuth, async (req,res) =>{
         nuevaPlantilla.userID = userID;
         nuevaPlantilla.fechaCreacion = Date.now();
 
-        //Creamos el dispostivo
+        //Creamos la plantilla
         const plantilla = await Plantilla.create( nuevaPlantilla );
 
         //Respuesta
@@ -45,7 +45,7 @@ router.post("/plantilla", checkAuth, async (req,res) =>{
 
 //Conseguir todas las plantillas
 router.get("/plantilla", checkAuth, async (req,res) =>{
-    try {
+    try { // Try-catch 37
         // console.log(req);
         //Constantes y variables
         const userID = req.datosUsuarios._id;
@@ -74,7 +74,7 @@ router.get("/plantilla", checkAuth, async (req,res) =>{
 
 //Borrar plantillas
 router.delete("/plantilla", checkAuth, async(req,res) =>{
-    try {
+    try { // Try-catch 38
         //Constantes y variables
         const userID = req.datosUsuarios._id;
         const plantillaID = req.query.plantillaID

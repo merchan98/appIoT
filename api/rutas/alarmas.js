@@ -8,7 +8,7 @@ const {checkAuth} = require('../middlewares/autenfificadortoken.js');
 
 
 //Imports
-import ReglaAlarma from '../modelos/emqxReglasAlarmas.js';
+import ReglaAlarma from '../modelos/reglasAlarmas.js';
 import ReglaGuardado from '../modelos/emqxReglaGuardado.js';
 
 
@@ -25,9 +25,11 @@ const auth ={
 
 //Crear una alarma
 router.post('/reglaAlarma', checkAuth, async (req,res) => {
-    try {
+    try { // Try-catch 11
         //Constantes y variables
         var nuevaRegla=req.body.regla;
+        console.log(req.datosUsuarios);
+        console.log(req.body);
         nuevaRegla.userID = req.datosUsuarios._id;
 
         //Llamamos a la funcion crear Alarma
@@ -52,7 +54,7 @@ router.post('/reglaAlarma', checkAuth, async (req,res) => {
 
 //Actualizar estado de una Alarma
 router.put('/reglaAlarma', checkAuth, async (req,res) => {
-    try {
+    try {// Try-catch 12
         //Constantes y variables
         var nuevaRegla=req.body.regla;
     
@@ -79,7 +81,7 @@ router.put('/reglaAlarma', checkAuth, async (req,res) => {
 
 //Borrar una alarma
 router.delete('/reglaAlarma', checkAuth, async (req,res) => {
-    try {
+    try {// Try-catch 13
         //Constantes y variables
         var emqxReglaID = req.query.emqxReglaID;
     
@@ -89,6 +91,7 @@ router.delete('/reglaAlarma', checkAuth, async (req,res) => {
         if (respuesta){
             const response ={
                 status:"success"
+                
             }
             return res.json(response);
         }else{
@@ -109,78 +112,92 @@ router.delete('/reglaAlarma', checkAuth, async (req,res) => {
 
 //Crerar una Alarma
 async function crearReglaAlarma(nuevaAlarma){
-    //Url de la api
-    const url = "http://localhost:8085/api/v4/rules";
-
-    //Contrucion del topic
-    const topic= nuevaAlarma.userID + "/" + nuevaAlarma.dID + "/"+ nuevaAlarma.variable +"/sdata";
-    console.log("ARLAM TOPIC");
-    console.log(topic);
-    //Sentencia SQL
-    const rawsql= "SELECT username, topic, payload FROM \""+topic+"\" WHERE payload.value " + nuevaAlarma.condicion+" "+ nuevaAlarma.value + " AND is_not_null(payload.value)";
-    //Objeto nueva Alarma
-    var nuevaRegla = {
-        rawsql: rawsql,
-        actions: [{
-            name: "data_to_webserver",
-            params:{
-                $resource: global.recursoAlarma.id,
-                payload_tmpl: '{"userID":"'+nuevaAlarma.userID+'",payload":${payload},"topic":"${topic}"}'
-            }
-        }],
-        description: "ALARMA - REGLA",
-        enabled: nuevaAlarma.status
-    };
-    //Llamada a la API para guardar la regla en EMQX
-    const respuesta =await axios.post(url, nuevaRegla, auth);
-    
-    console.log(respuesta.data);
-    //Sacamos el ID de la regla
-    var emqxReglaID = respuesta.data.data.id;
-
-    console.log("SALIDA DESDE CREAR REGLA ALARMA");
-    console.log(respuesta.data.data);
-
-    if(respuesta.data.data && respuesta.status === 200){
-        //Grabamos la Regla en Mongo
-        const reglaMongo = await ReglaAlarma.create({
-            userID: nuevaAlarma.userID ,
-            dID: nuevaAlarma.dID ,
-            
-            emqxReglaID: emqxReglaID ,
-            status:nuevaAlarma.status ,
-            variableNombreCompleto: nuevaAlarma.variableNombreCompleto ,
-            variable: nuevaAlarma.variable ,
-            value: nuevaAlarma.value ,
-            condicion: nuevaAlarma.condicion ,
-            triggerTime: nuevaAlarma.triggerTime ,
-            fechaCreacion: Date.now() 
-        });
-        //Modificamos el payload con los datos nuevos entrellos el ID 
-
+    try { // Try-catch 14
         //Url de la api
-        const url2 = "http://localhost:8085/api/v4/rules/"+ reglaMongo.emqxReglaID;
-
-        //Nuevlo payload
-        const payloadNuevo ='{"userID":"'+nuevaAlarma.userID+'","dID":"'+nuevaAlarma.dID +'","dNombre":"'+nuevaAlarma.dNombre + '","payload":${payload},"topic":"${topic}","emqxReglaID":"'+ reglaMongo.emqxReglaID+'","value":'+ nuevaAlarma.value+',"condicion":"'+ nuevaAlarma.condicion+'","variable":"'+ nuevaAlarma.variable+'","variableNombreCompleto":"'+ nuevaAlarma.variableNombreCompleto+'","triggerTime":'+ nuevaAlarma.triggerTime+ '}';
-        console.log("payload nuevo************");
-        console.log(payloadNuevo);
-        //Modificamos el objeto
-        nuevaRegla.actions[0].params.payload_tmpl=payloadNuevo;
-
+        const url = "http://localhost:8085/api/v4/rules";
+    
+        //Contrucion del topic
+        const topic= nuevaAlarma.userID + "/" + nuevaAlarma.dID + "/"+ nuevaAlarma.variable +"/sdata";
+        console.log("ARLAM TOPIC");
+        console.log(topic);
+        
+        //Sentencia SQL
+        const rawsql= 'SELECT username, topic, payload FROM "'+topic+'" WHERE payload.value ' + nuevaAlarma.condicion+" "+ nuevaAlarma.value + " AND is_not_null(payload.value)";
+        //Objeto nueva Alarma
+        var nuevaRegla = {
+            rawsql: rawsql,
+            actions: [{
+                name: "data_to_webserver",
+                params:{
+                    $resource: global.recursoAlarma.id,
+                    payload_tmpl: '{"userID":"'+nuevaAlarma.userID+'","payload":${payload},"topic":"${topic}"}'
+                }
+            }],
+            description: "ALARMA - REGLA",
+            enabled: nuevaAlarma.status
+        };
         //Llamada a la API para guardar la regla en EMQX
         const respuesta =await axios.post(url, nuevaRegla, auth);
-
-        console.log("¡La nueva Alarma a sido Creada!".green);
-
-        return true;
+        
+        console.log(respuesta.data);
+        //Sacamos el ID de la regla
+        var emqxReglaID = respuesta.data.data.id;
+    
+        console.log("SALIDA DESDE CREAR REGLA ALARMA");
+        console.log(respuesta.data.data);
+    
+        if(respuesta.data.data && respuesta.status === 200){
+            //Grabamos la Regla en Mongo
+            const reglaMongo = await ReglaAlarma.create({
+                userID: nuevaAlarma.userID ,
+                dID: nuevaAlarma.dID ,
+                
+                emqxReglaID: emqxReglaID ,
+                status:nuevaAlarma.status ,
+                variableNombreCompleto: nuevaAlarma.variable ,
+                variable: nuevaAlarma.variable ,
+                value: nuevaAlarma.value ,
+                condicion: nuevaAlarma.condicion ,
+                triggerTime: nuevaAlarma.triggerTime ,
+                fechaCreacion: Date.now() 
+            });
+            //Modificamos el payload con los datos nuevos entrellos el ID 
+    
+            //Url de la api
+            const url2 = "http://localhost:8085/api/v4/rules/"+ reglaMongo.emqxReglaID; 
+    
+            //Nuevlo payload
+            const payloadNuevo ='{"userID":"'+nuevaAlarma.userID+
+            '","dID":"'+nuevaAlarma.dID +
+            '","dNombre":"'+nuevaAlarma.dNombre + 
+            '","payload":${payload},"topic":"${topic}","emqxReglaID":"'+ reglaMongo.emqxReglaID+
+            '","value":'+ nuevaAlarma.value+
+            ',"condicion":"'+ nuevaAlarma.condicion+
+            '","variable":"'+ nuevaAlarma.variable+
+            '","variableNombreCompleto":"'+ nuevaAlarma.variable+
+            '","triggerTime":'+ nuevaAlarma.triggerTime+ "}";
+            console.log("payload nuevo************");
+            console.log(payloadNuevo);
+            //Modificamos el objeto
+            nuevaRegla.actions[0].params.payload_tmpl=payloadNuevo;
+    
+            //Llamada a la API para guardar la regla en EMQX
+            const respuesta =await axios.put(url2, nuevaRegla, auth);
+    
+            console.log("¡La nueva Alarma a sido Creada!".green);
+    
+            return true;
+        }
+    } catch (error) {
+        console.log("Error en la funcion de crear la regla Alarma");
+        console.log(error);
     }
 
 }
 
 //Actualizar status Alarma
 async function updateStatusAlarma(emqxReglaID, status){
-    try {
+    try {// Try-catch 15
         //Url de la api
         const url = "http://localhost:8085/api/v4/rules/"+emqxReglaID;
 
@@ -216,7 +233,7 @@ async function updateStatusAlarma(emqxReglaID, status){
 
 //Borrar una ALarma
 async function borrarReglaAlarma(emqxReglaID){
-    try {
+    try {// Try-catch 16
         //Url de la api
         const url = "http://localhost:8085/api/v4/rules/"+ emqxReglaID;
         

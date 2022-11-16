@@ -22,7 +22,7 @@ global.recursoAlarma = null;
 
 //Listado de recursos EMQX
 async function listarRecursos(){
-    try {
+    try { // Try-catch 34
         //Contantes
         const  recursoGuardado ={
             "type": "web_hook",
@@ -106,7 +106,7 @@ async function listarRecursos(){
 
 //Crear Recurso
 async function crearRecurso(recursoNuevo){
-    try {
+    try { // Try-catch 35
         const url = "http://localhost:8085/api/v4/resources"
 
         //Comprobar que tenemos los campos necesarios 
@@ -138,7 +138,11 @@ async function crearRecurso(recursoNuevo){
 }
 
 
-listarRecursos();
+setTimeout(() => {
+    listarRecursos();
+}, 3000);
+
+
 
 //export
 module.exports =router; 

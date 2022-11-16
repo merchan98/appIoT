@@ -239,7 +239,9 @@
                     <IotBoton v-if="widgetTipo == 'boton'" :config="configBoton2"></IotBoton>
                     <IotIndicador v-if="widgetTipo == 'indicador'" :config="configIndicador"></IotIndicador>
                     <IoTGraficaNum v-if="widgetTipo == 'graficoNum'" :config="ncConfig"></IoTGraficaNum>
+                    <!-- <p v-if="widgetTipo == 'graficoNum'">{{this.widgetTipo}}</p> -->
                     <IotSwitch v-if="widgetTipo== 'switch'" :config="configSwitch"></IotSwitch>
+                    <!-- {{this.ncConfig}} -->
                 </div>
 
             </div>
@@ -267,6 +269,7 @@
                 <IotBoton v-if="widget.widget == 'boton'" :config="widget"></IotBoton>
                 <IotIndicador v-if="widget.widget == 'indicador'" :config="widget"></IotIndicador>
                 <IoTGraficaNum v-if="widget.widget == 'graficoNum'" :config="widget"></IoTGraficaNum>
+                <!-- <p v-if="widget.widget == 'graficoNum'">{{widget}}</p> -->
                 <IotSwitch v-if="widget.widget== 'switch'" :config="widget"></IotSwitch>
             </div>
         </div>
@@ -477,7 +480,9 @@ export default{
                 }
                 if(this.widgetTipo == "graficoNum"){
                     // this.ncConfig.variable = this.realizarID(13);
-                    this.widgets.push(JSON.parse(JSON.stringify(this.ncConfig)));
+                    //this.widgets.push(JSON.parse(JSON.stringify(this.ncConfig)));
+                    this.widgets.push(this.ncConfig);
+                    console.log(this.ncConfig);
                 }
             },
             //Fundicon de Prueba mirar el hash para hacer esto.

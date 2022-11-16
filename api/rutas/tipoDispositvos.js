@@ -17,9 +17,9 @@ import Dispositivo from '../modelos/dispositivo.js';
 import TipoDispositivo from '../modelos/tiposDispositvos.js';
 
 
-//peticion de dispostivos
+//peticion de tipos de dispostivos
 router.get("/tipodDispositivo", checkAuth, async (req, res) => {
-    try {
+    try { // Try-catch 53
         // console.log(req);
         //Constantes y variables
         const userID = req.datosUsuarios._id;
@@ -51,9 +51,9 @@ router.get("/tipodDispositivo", checkAuth, async (req, res) => {
     }
 });
 
-//Creacion del dispostivos
+//Creacion del tipo de dispostivos
 router.post("/tipodDispositivo", checkAuth , async (req, res) => {
-    try {
+    try { // Try-catch 54
         //Constantes y variables
         // const userID = req.datosUsuarios._id;
         var nuevoDispositvo = req.body.nuevoTipoDispostivo;
@@ -102,8 +102,7 @@ router.post("/tipodDispositivo", checkAuth , async (req, res) => {
 
 //Borrado del Dispositvo
 router.delete("/tipodDispositivo", checkAuth , async (req, res) => {
-    
-    try {
+    try { // Try-catch 55
         //Constantes y variables
         // const userID = req.datosUsuarios._id;
         const tipDispID = req.TipoDispositivoID
@@ -124,12 +123,10 @@ router.delete("/tipodDispositivo", checkAuth , async (req, res) => {
             return res.json(toSend);
         }
 
-
         //Busqueda del que hay que eliminar
         //Se compueba que el dispostivo es del usuario tambien
         const resBorrado = await TipoDispositivo.deleteOne({tipoDispositivoID : tipDispID});
         
-
         //Respuesta 
         const toSend = {
             status: "success",
@@ -154,8 +151,8 @@ router.delete("/tipodDispositivo", checkAuth , async (req, res) => {
 
 //Funciones
 
-async function  verificaionVariables(variables){
-    try {
+async function verificaionVariables(variables){
+    try { // Try-catch 56
         //Constantes y variables
         let nombresVar={}
         console.log(variables);
