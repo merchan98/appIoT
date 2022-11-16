@@ -24,7 +24,7 @@ $ npm run start
 # generate static project
 $ npm run generate
 
-#lunch mongo and EMQX
+#launch mongo and EMQX
 $ ./Docker/docker-compose up
 ```
 Si se opta por hacerlo de manera completa en docker, el docker-compose esta preparado para ejcuar la app con el comando docker-compose up dendero de la carpeta Doker del proyecto. Aún asi se sigue necesitando modificar las IPs del proyecto por las del servidor o ordenador que lo ejecute.
